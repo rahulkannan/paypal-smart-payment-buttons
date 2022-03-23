@@ -137,7 +137,7 @@ export function isUnprocessableEntityError(err : mixed) : boolean {
 export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`capture_order_lsat_upgrade_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`);
     getLogger().info(`capture_order_lsat_upgrade_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { err: stringifyError(getLsatUpgradeError()) });
-
+    console.log('gb:log calling orders service');
     if (forceRestAPI && !getLsatUpgradeError()) {
         return callRestAPI({
             accessToken: facilitatorAccessToken,
@@ -152,10 +152,15 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
         }).catch(err => {
             const restCorrID = getErrorResponseCorrelationID(err);
             getLogger().warn(`capture_order_call_rest_api_error`, { restCorrID, orderID, err: stringifyError(err) });
+            console.log('gb:log there were an error ');
+            console.log('gb:log', err);
+ 
 
             if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) {
+                console.log('gb:log throwing error');
                 throw err;
             }
+
 
             return callSmartAPI({
                 accessToken: buyerAccessToken,
