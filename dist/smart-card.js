@@ -7836,6 +7836,7 @@ window.smartCard = function(modules) {
                                             getLogger().info("capture_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
                                                 err: stringifyError(getLsatUpgradeError())
                                             });
+                                            console.log("gb:log calling orders service");
                                             if (forceRestAPI && !getLsatUpgradeError()) {
                                                 var _headers5;
                                                 return callRestAPI({
@@ -7854,7 +7855,12 @@ window.smartCard = function(modules) {
                                                         orderID: orderID,
                                                         err: stringifyError(err)
                                                     });
-                                                    if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) throw err;
+                                                    console.log("gb:log there were an error ");
+                                                    console.log("gb:log", err);
+                                                    if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) {
+                                                        console.log("gb:log throwing error");
+                                                        throw err;
+                                                    }
                                                     return callSmartAPI({
                                                         accessToken: buyerAccessToken,
                                                         method: "post",

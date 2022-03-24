@@ -7172,7 +7172,7 @@ window.spb = function(modules) {
             logger_getLogger().info("rest_api_create_order_token");
             var headers = ((_headers15 = {}).authorization = "Bearer " + accessToken, _headers15["paypal-partner-attribution-id"] = partnerAttributionID, 
             _headers15["paypal-client-metadata-id"] = clientMetadataID, _headers15["x-app-name"] = "smart-payment-buttons", 
-            _headers15["x-app-version"] = "5.0.88", _headers15);
+            _headers15["x-app-version"] = "5.0.89", _headers15);
             var paymentSource = {
                 token: {
                     id: paymentMethodID,
@@ -7977,6 +7977,7 @@ window.spb = function(modules) {
                                                 logger_getLogger().info("capture_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
                                                     err: stringifyError(getLsatUpgradeError())
                                                 });
+                                                console.log("gb:log calling orders service");
                                                 if (forceRestAPI && !getLsatUpgradeError()) {
                                                     var _headers5;
                                                     return callRestAPI({
@@ -7995,7 +7996,12 @@ window.spb = function(modules) {
                                                             orderID: orderID,
                                                             err: stringifyError(err)
                                                         });
-                                                        if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) throw err;
+                                                        console.log("gb:log there were an error ");
+                                                        console.log("gb:log", err);
+                                                        if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) {
+                                                            console.log("gb:log throwing error");
+                                                            throw err;
+                                                        }
                                                         return callSmartAPI({
                                                             accessToken: buyerAccessToken,
                                                             method: "post",
@@ -13297,7 +13303,7 @@ window.spb = function(modules) {
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.88", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.89", 
                     _ref3.button_correlation_id = buttonCorrelationID, _ref3.stickiness_id = isAndroidChrome() ? stickinessID : null, 
                     _ref3.bn_code = partnerAttributionID, _ref3.user_action = commit ? "commit" : "continue", 
                     _ref3.seller_id = merchantID[0], _ref3.merchant_domain = merchantDomain, _ref3.t = Date.now().toString(), 
