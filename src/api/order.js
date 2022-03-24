@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-console */
 /* @flow */
 /* eslint max-lines: 0 */
 
@@ -818,7 +820,7 @@ type TokenizeCardResult = {|
 
 export function tokenizeCard({ card } : TokenizeCardOptions) : ZalgoPromise<TokenizeCardResult> {
     return ZalgoPromise.try(() => {
-        // eslint-disable-next-line no-console
+         
         console.info('Card Tokenize GQL mutation not yet implemented', { card });
         return {
             paymentMethodToken: uniqueID()
