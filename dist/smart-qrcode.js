@@ -704,7 +704,7 @@
             } else if ("o" === l[0] && "n" === l[1]) o = l !== (l = l.replace(/Capture$/, "")), 
             l = l.toLowerCase() in n ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), 
             n.l[l + o] = u, u ? i || n.addEventListener(l, o ? T : I, o) : n.removeEventListener(l, o ? T : I, o); else if ("dangerouslySetInnerHTML" !== l) {
-                if (t) l = l.replace(/xlink[H:h]/, "h").replace(/sName$/, "s"); else if ("href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && l in n) try {
+                if (t) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s"); else if ("href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && l in n) try {
                     n[l] = null == u ? "" : u;
                     break n;
                 } catch (n) {}
@@ -820,11 +820,11 @@
             return this.constructor(n, u);
         }
         n = c.slice, l = {
-            __e: function(n, l) {
-                for (var u, i, t; l = l.__; ) if ((u = l.__c) && !u.__) try {
-                    if ((i = u.constructor) && null != i.getDerivedStateFromError && (u.setState(i.getDerivedStateFromError(n)), 
-                    t = u.__d), null != u.componentDidCatch && (u.componentDidCatch(n), t = u.__d), 
-                    t) return u.__E = u;
+            __e: function(n, l, u, i) {
+                for (var t, o, r; l = l.__; ) if ((t = l.__c) && !t.__) try {
+                    if ((o = t.constructor) && null != o.getDerivedStateFromError && (t.setState(o.getDerivedStateFromError(n)), 
+                    r = t.__d), null != t.componentDidCatch && (t.componentDidCatch(n, i || {}), r = t.__d), 
+                    r) return t.__E = t;
                 } catch (l) {
                     n = l;
                 }
@@ -840,7 +840,7 @@
         }, _.prototype.render = d, preact_module_t = [], preact_module_o = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, 
         g.__r = 0;
         var hooks_module_t, hooks_module_u, hooks_module_r, hooks_module_o = 0, hooks_module_i = [], hooks_module_c = l.__b, hooks_module_f = l.__r, hooks_module_e = l.diffed, hooks_module_a = l.__c, hooks_module_v = l.unmount;
-        function hooks_module_m(t, r) {
+        function hooks_module_l(t, r) {
             l.__h && l.__h(hooks_module_u, t, hooks_module_o || r), hooks_module_o = 0;
             var i = hooks_module_u.__H || (hooks_module_u.__H = {
                 __: [],
@@ -848,9 +848,9 @@
             });
             return t >= i.__.length && i.__.push({}), i.__[t];
         }
-        function hooks_module_l(n) {
+        function hooks_module_m(n) {
             return hooks_module_o = 1, function(n, r, o) {
-                var i = hooks_module_m(hooks_module_t++, 2);
+                var i = hooks_module_l(hooks_module_t++, 2);
                 return i.t = n, i.__c || (i.__ = [ hooks_module_w(void 0, r), function(n) {
                     var t = i.t(i.__[0], n);
                     i.__[0] !== t && (i.__ = [ t, i.__[1] ], i.__c.setState({}));
@@ -2894,17 +2894,6 @@
             tertiary: "#009EE3",
             quaternary: "#009EE3"
         };
-        var multiblanco_logo_LOGO_COLORS;
-        (multiblanco_logo_LOGO_COLORS = {}).default = {
-            primary: "#373535",
-            secondary: "#1866AB"
-        }, multiblanco_logo_LOGO_COLORS.white = {
-            primary: "#ffffff",
-            secondary: "#ffffff"
-        }, multiblanco_logo_LOGO_COLORS.black = {
-            primary: "#373535",
-            secondary: "#1866AB"
-        };
         var multibanco_logo_LOGO_COLORS;
         (multibanco_logo_LOGO_COLORS = {}).default = {
             primary: "#373535",
@@ -3165,7 +3154,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref2;
                 return (_ref2 = {}).state_name = "smart_button", _ref2.context_type = "EC-Token", 
-                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.88", 
+                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.89", 
                 _ref2.user_id = buttonSessionID, _ref2;
             }));
             (function() {
@@ -3286,12 +3275,12 @@
         function QRCard(_ref) {
             var svgString = _ref.svgString;
             var _useXProps = function() {
-                var _useState = hooks_module_l(window.xprops), xprops = _useState[0], setXProps = _useState[1];
+                var _useState = hooks_module_m(window.xprops), xprops = _useState[0], setXProps = _useState[1];
                 r = function() {
                     return xprops.onProps((function(newProps) {
                         setXProps(_extends({}, newProps));
                     }));
-                }, o = [], i = hooks_module_m(hooks_module_t++, 3), !l.__s && function(n, t) {
+                }, o = [], i = hooks_module_l(hooks_module_t++, 3), !l.__s && function(n, t) {
                     return !n || n.length !== t.length || t.some((function(t, u) {
                         return t !== n[u];
                     }));
@@ -3306,7 +3295,7 @@
                 });
             }(), state = _useXProps.state, errorText = _useXProps.errorText, setState = _useXProps.setState, close = _useXProps.close, cancel = _useXProps.onCancel;
             var survey = function() {
-                var _useState = hooks_module_l({
+                var _useState = hooks_module_m({
                     isEnabled: !1,
                     reason: "prefer_not_to_say"
                 }), state = _useState[0], setState = _useState[1];
