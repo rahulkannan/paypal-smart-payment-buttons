@@ -159,7 +159,7 @@ export function getButtonMiddleware({
             } catch (err) {
                 return clientErrorResponse(res, err.stack || err.message);
             }
-            logger.info(req, `button_props`, { params: JSON.stringify(buttonProps) });
+
             const buttonHTML = render.button.Buttons(buttonProps).render(html());
 
             const setupParams = {
