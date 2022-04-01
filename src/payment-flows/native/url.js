@@ -98,11 +98,12 @@ type NativeUrlQuery = {|
     domain : string,
     rtdbInstanceID : string,
     buyerCountry : $Values<typeof COUNTRY>,
-    sdkVersion : string
+    sdkVersion : string,
+    vault : boolean
 |};
 
 function getNativeUrlQueryParams({ props, serviceData, config, fundingSource, sessionUID, pageUrl, orderID, stickinessID } : GetNativeUrlOptions) : NativeUrlQuery {
-    const { env, clientID, commit, buttonSessionID, stageHost, apiStageHost, enableFunding, merchantDomain } = props;
+    const { env, clientID, commit, buttonSessionID, stageHost, apiStageHost, enableFunding, merchantDomain, vault } = props;
     const { facilitatorAccessToken, sdkMeta, buyerCountry } = serviceData;
     const { sdkVersion, firebase } = config;
 
@@ -134,7 +135,8 @@ function getNativeUrlQueryParams({ props, serviceData, config, fundingSource, se
         domain:         merchantDomain,
         rtdbInstanceID: firebase.databaseURL,
         buyerCountry,
-        sdkVersion
+        sdkVersion,
+        vault
     };
 
     if (queryParams.channel === CHANNEL.DESKTOP) {

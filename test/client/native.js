@@ -79,6 +79,10 @@ const validateNativeURL = (url) => {
         throw new Error(`Expected sdkVersion to be passed in url`);
     }
 
+    if (!redirectQuery.vault) {
+        throw new Error(`Expected vault to be passed in url`);
+    }
+
     return {
         url:    redirectUrl,
         domain: redirectDomain,
