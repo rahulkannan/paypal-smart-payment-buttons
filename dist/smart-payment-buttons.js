@@ -7170,7 +7170,7 @@ window.spb = function(modules) {
             logger_getLogger().info("rest_api_create_order_token");
             var headers = ((_headers15 = {}).authorization = "Bearer " + accessToken, _headers15["paypal-partner-attribution-id"] = partnerAttributionID, 
             _headers15["paypal-client-metadata-id"] = clientMetadataID, _headers15["x-app-name"] = "smart-payment-buttons", 
-            _headers15["x-app-version"] = "5.0.94", _headers15);
+            _headers15["x-app-version"] = "5.0.95", _headers15);
             var paymentSource = {
                 token: {
                     id: paymentMethodID,
@@ -14466,12 +14466,12 @@ window.spb = function(modules) {
                 }));
                 logger.addTrackingBuilder((function() {
                     var _ref3;
-                    return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.94", 
-                    _ref3.button_correlation_id = buttonCorrelationID, _ref3.stickiness_id = isAndroidChrome() ? stickinessID : null, 
-                    _ref3.bn_code = partnerAttributionID, _ref3.user_action = commit ? "commit" : "continue", 
-                    _ref3.seller_id = merchantID[0], _ref3.merchant_domain = merchantDomain, _ref3.t = Date.now().toString(), 
-                    _ref3.time = Date.now().toString(), _ref3.user_id = buttonSessionID, _ref3;
+                    return (_ref3 = {}).context_type = "button_session_id", _ref3.context_id = buttonSessionID, 
+                    _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.95", _ref3.button_correlation_id = buttonCorrelationID, 
+                    _ref3.stickiness_id = isAndroidChrome() ? stickinessID : null, _ref3.bn_code = partnerAttributionID, 
+                    _ref3.user_action = commit ? "commit" : "continue", _ref3.seller_id = merchantID[0], 
+                    _ref3.merchant_domain = merchantDomain, _ref3.t = Date.now().toString(), _ref3.time = Date.now().toString(), 
+                    _ref3.user_id = buttonSessionID, _ref3;
                 }));
                 (function() {
                     if (window.document.documentMode) try {
@@ -14523,9 +14523,21 @@ window.spb = function(modules) {
                     logger.info("button_render_wallet_instrument_count_" + walletInstruments.length);
                     logger.info("button_render_" + native_device + "_storage_state_" + (isStorageStateFresh() ? "fresh" : "not_fresh"));
                     for (var _i2 = 0; _i2 < walletInstruments.length; _i2++) logger.info("button_render_wallet_instrument_" + walletInstruments[_i2]);
-                    logger.track(((_logger$track = {}).transition_name = "process_button_load", _logger$track.eligible_payment_methods = fundingSources.join(":"), 
-                    _logger$track.fi_list = walletInstruments.join(":"), _logger$track.merchant_selected_funding_source = fundingSource, 
-                    _logger$track.eligible_payment_count = fundingSources.length.toString(), _logger$track.page_load_time = pageRenderTime ? pageRenderTime.toString() : "", 
+                    if (window.logClientSideCPL) {
+                        var _window$cplPhases, _window$cplPhases2, _window$cplPhases3, _logger$info$track;
+                        window.logClientSideCPL("second-render-body", "comp");
+                        logger.info("CPL_LATENCY_METRICS_SECOND_RENDER").track(((_logger$info$track = {}).state_name = "CPL_LATENCY_METRICS", 
+                        _logger$info$track.transition_name = "process_server_metrics / process_client_metrics", 
+                        _logger$info$track.page_name = "main:xo:paypal-components:smart-payment-buttons", 
+                        _logger$info$track.cpl_comp_metrics = JSON.stringify((null == (_window$cplPhases = window.cplPhases) ? void 0 : _window$cplPhases.comp) || {}), 
+                        _logger$info$track.cpl_query_metrics = JSON.stringify((null == (_window$cplPhases2 = window.cplPhases) ? void 0 : _window$cplPhases2.query) || {}), 
+                        _logger$info$track.cpl_chunk_metrics = JSON.stringify((null == (_window$cplPhases3 = window.cplPhases) ? void 0 : _window$cplPhases3.chunk) || {}), 
+                        _logger$info$track));
+                    } else logger.info("button_render_CPL_instrumentation_not_injected");
+                    logger.track(((_logger$track = {}).state_name = "smart_button", _logger$track.transition_name = "process_button_load", 
+                    _logger$track.eligible_payment_methods = fundingSources.join(":"), _logger$track.fi_list = walletInstruments.join(":"), 
+                    _logger$track.merchant_selected_funding_source = fundingSource, _logger$track.eligible_payment_count = fundingSources.length.toString(), 
+                    _logger$track.page_load_time = pageRenderTime ? pageRenderTime.toString() : "", 
                     _logger$track.potential_payment_methods = queriedEligibleFunding.join(":"), _logger$track.pay_now = payNow.toString(), 
                     _logger$track.button_layout = layout, _logger$track.button_color = color, _logger$track.button_size = "responsive", 
                     _logger$track.button_shape = shape, _logger$track.button_label = label, _logger$track.button_width = window.innerWidth, 
