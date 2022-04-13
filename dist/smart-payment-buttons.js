@@ -7170,7 +7170,7 @@ window.spb = function(modules) {
             logger_getLogger().info("rest_api_create_order_token");
             var headers = ((_headers15 = {}).authorization = "Bearer " + accessToken, _headers15["paypal-partner-attribution-id"] = partnerAttributionID, 
             _headers15["paypal-client-metadata-id"] = clientMetadataID, _headers15["x-app-name"] = "smart-payment-buttons", 
-            _headers15["x-app-version"] = "5.0.95", _headers15);
+            _headers15["x-app-version"] = "5.0.96", _headers15);
             var paymentSource = {
                 token: {
                     id: paymentMethodID,
@@ -12043,7 +12043,7 @@ window.spb = function(modules) {
         }
         function getNativeUrlQueryParams(_ref4) {
             var props = _ref4.props, serviceData = _ref4.serviceData, config = _ref4.config, fundingSource = _ref4.fundingSource, sessionUID = _ref4.sessionUID, pageUrl = _ref4.pageUrl, orderID = _ref4.orderID, stickinessID = _ref4.stickinessID;
-            var env = props.env, clientID = props.clientID, commit = props.commit, buttonSessionID = props.buttonSessionID, stageHost = props.stageHost, apiStageHost = props.apiStageHost, enableFunding = props.enableFunding, merchantDomain = props.merchantDomain;
+            var env = props.env, clientID = props.clientID, commit = props.commit, buttonSessionID = props.buttonSessionID, stageHost = props.stageHost, apiStageHost = props.apiStageHost, enableFunding = props.enableFunding, merchantDomain = props.merchantDomain, vault = props.vault;
             var facilitatorAccessToken = serviceData.facilitatorAccessToken, sdkMeta = serviceData.sdkMeta, buyerCountry = serviceData.buyerCountry;
             var sdkVersion = config.sdkVersion, firebase = config.firebase;
             var webCheckoutUrl = function(_ref3) {
@@ -12092,7 +12092,8 @@ window.spb = function(modules) {
                 domain: merchantDomain,
                 rtdbInstanceID: firebase.databaseURL,
                 buyerCountry: buyerCountry,
-                sdkVersion: sdkVersion
+                sdkVersion: sdkVersion,
+                vault: vault
             };
             "desktop-web" === queryParams.channel && delete queryParams.sdkMeta;
             return queryParams;
@@ -14470,7 +14471,7 @@ window.spb = function(modules) {
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.95", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.96", 
                     _ref3.button_correlation_id = buttonCorrelationID, _ref3.stickiness_id = isAndroidChrome() ? stickinessID : null, 
                     _ref3.bn_code = partnerAttributionID, _ref3.user_action = commit ? "commit" : "continue", 
                     _ref3.seller_id = merchantID[0], _ref3.merchant_domain = merchantDomain, _ref3.t = Date.now().toString(), 
