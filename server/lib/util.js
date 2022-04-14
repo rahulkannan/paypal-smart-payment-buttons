@@ -2,7 +2,7 @@
 
 import { dirname } from 'path';
 
-import { webpackCompile } from '@krakenjs/webpack-mem-compile';
+import { webpackCompile } from 'webpack-mem-compile';
 import webpack from 'webpack';
 import { regexTokenize } from '@krakenjs/belter';
 import type { ChildType, NullableChildType } from '@krakenjs/jsx-pragmatic/src';
@@ -231,7 +231,7 @@ export function copy<T>(obj : T) : T {
         // $FlowFixMe
         return;
     }
-    
+
     return JSON.parse(stringified);
 }
 
