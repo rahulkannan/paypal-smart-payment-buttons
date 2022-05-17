@@ -5,3 +5,4 @@ export * from './menu';
 export * from './card';
 export * from './native';
 export * from './qrcode';
+export * from './auth-button';

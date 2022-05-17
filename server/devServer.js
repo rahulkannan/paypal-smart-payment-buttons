@@ -17,6 +17,7 @@ import {
     getQRCodeMiddleware
 } from '../index';
 
+import {  getAuthButtonMiddleware } from './components/auth-button/middleware';
 import type { GraphQL } from './lib/graphql';
 import type { ExpressRequest, ExpressResponse } from './types';
 
@@ -266,7 +267,7 @@ const defaultMiddleware = (req : ExpressRequest, res : ExpressResponse, next) =>
     res.locals.nonce = nonce;
 
     res.header('content-security-policy', `style-src self 'nonce-${ nonce }'; script-src self 'nonce-${ nonce }';`);
-    
+
     next();
 };
 
@@ -282,6 +283,12 @@ const buttonMiddleware = getButtonMiddleware({
     getPersonalizationEnabled,
     getInstanceLocationInformation,
     getSDKLocationInformation
+});
+
+const authButtonMiddleware = getAuthButtonMiddleware({
+    cache,
+    logger,
+    getInstanceLocationInformation
 });
 
 const menuMiddleware = getMenuMiddleware({
@@ -334,6 +341,7 @@ const venmoFallbackMiddleware = getNativeFallbackMiddleware({
 
 const buttonsScriptMiddleware = webpackDevMiddleware(webpack(WEBPACK_CONFIG_BUTTONS_LOCAL_DEBUG), { serverSideRender: true });
 
+app.use('/smart/auth-button', defaultMiddleware, buttonsScriptMiddleware, authButtonMiddleware);
 app.use('/smart/buttons', defaultMiddleware, buttonsScriptMiddleware, buttonMiddleware);
 app.use('/smart/menu', defaultMiddleware, menuMiddleware);
 app.use('/smart/qrcode', defaultMiddleware, qrCodeMiddleware);
