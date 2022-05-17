@@ -19,7 +19,7 @@ type ExportsProps = {|
 |};
 
 export function setupExports({ props, isEnabled, facilitatorAccessToken, fundingEligibility, merchantID } : ExportsProps)  {
-    const { createOrder, onApprove, onError, onCancel, onClick, commit, intent, fundingSource, currency } = props;
+    const { createOrder, onApprove, onError, onCancel, onClick, onShippingChange, commit, intent, fundingSource, currency } = props;
 
     const fundingSources = querySelectorAll(`[${ DATA_ATTRIBUTES.FUNDING_SOURCE }]`).map(el => {
         return el.getAttribute(DATA_ATTRIBUTES.FUNDING_SOURCE);
@@ -84,6 +84,20 @@ export function setupExports({ props, isEnabled, facilitatorAccessToken, funding
                 },
                 getFacilitatorAccessToken: () => {
                     return facilitatorAccessToken;
+                },
+                onShippingChange: (data) => {
+                    if (onShippingChange) {
+                        const actions = {
+                            resolve: () => {
+                                throw new Error('Action unimplemented');
+                            },
+                            reject: () => {
+                                throw new Error('Action unimplemented');
+                            }
+                        };
+                    
+                        return onShippingChange(data, actions);
+                    }
                 }
             };
         }
