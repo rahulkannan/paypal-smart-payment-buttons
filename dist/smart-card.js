@@ -4082,9 +4082,9 @@ window.smartCard = function(modules) {
         })), S.d(N, "FUNDING", (function() {
             return m;
         })), S.d(N, "FUNDING_BRAND_LABEL", (function() {
-            return y;
-        })), S.d(N, "CARD", (function() {
             return b;
+        })), S.d(N, "CARD", (function() {
+            return y;
         })), S.d(N, "WALLET_INSTRUMENT", (function() {
             return W;
         })), S.d(N, "FUNDING_PRODUCTS", (function() {
@@ -4116,9 +4116,9 @@ window.smartCard = function(modules) {
         })), S.d(N, "QUERY_BOOL", (function() {
             return o;
         })), S.d(N, "UNKNOWN", (function() {
-            return i;
-        })), S.d(N, "PROTOCOL", (function() {
             return O;
+        })), S.d(N, "PROTOCOL", (function() {
+            return i;
         })), S.d(N, "PAGE_TYPES", (function() {
             return M;
         })), S.d(N, "MERCHANT_ID_MAX", (function() {
@@ -4735,7 +4735,7 @@ window.smartCard = function(modules) {
         }, o = {
             TRUE: "true",
             FALSE: "false"
-        }, i = "unknown", O = {
+        }, O = "unknown", i = {
             HTTP: "http",
             HTTPS: "https"
         }, M = {
@@ -4855,13 +4855,14 @@ window.smartCard = function(modules) {
             MAXIMA: "maxima",
             OXXO: "oxxo",
             BOLETO: "boleto",
+            BOLETOBANCARIO: "boletobancario",
             WECHATPAY: "wechatpay",
             MERCADOPAGO: "mercadopago",
             MULTIBANCO: "multibanco"
-        }, y = {
+        }, b = {
             PAYPAL: "PayPal",
             CREDIT: "PayPal Credit"
-        }, b = {
+        }, y = {
             VISA: "visa",
             MASTERCARD: "mastercard",
             AMEX: "amex",

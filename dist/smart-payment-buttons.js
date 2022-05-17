@@ -3468,9 +3468,9 @@ window.spb = function(modules) {
             })), S.d(N, "FUNDING", (function() {
                 return m;
             })), S.d(N, "FUNDING_BRAND_LABEL", (function() {
-                return y;
-            })), S.d(N, "CARD", (function() {
                 return b;
+            })), S.d(N, "CARD", (function() {
+                return y;
             })), S.d(N, "WALLET_INSTRUMENT", (function() {
                 return W;
             })), S.d(N, "FUNDING_PRODUCTS", (function() {
@@ -3502,9 +3502,9 @@ window.spb = function(modules) {
             })), S.d(N, "QUERY_BOOL", (function() {
                 return o;
             })), S.d(N, "UNKNOWN", (function() {
-                return i;
-            })), S.d(N, "PROTOCOL", (function() {
                 return O;
+            })), S.d(N, "PROTOCOL", (function() {
+                return i;
             })), S.d(N, "PAGE_TYPES", (function() {
                 return M;
             })), S.d(N, "MERCHANT_ID_MAX", (function() {
@@ -4121,7 +4121,7 @@ window.spb = function(modules) {
             }, o = {
                 TRUE: "true",
                 FALSE: "false"
-            }, i = "unknown", O = {
+            }, O = "unknown", i = {
                 HTTP: "http",
                 HTTPS: "https"
             }, M = {
@@ -4241,13 +4241,14 @@ window.spb = function(modules) {
                 MAXIMA: "maxima",
                 OXXO: "oxxo",
                 BOLETO: "boleto",
+                BOLETOBANCARIO: "boletobancario",
                 WECHATPAY: "wechatpay",
                 MERCADOPAGO: "mercadopago",
                 MULTIBANCO: "multibanco"
-            }, y = {
+            }, b = {
                 PAYPAL: "PayPal",
                 CREDIT: "PayPal Credit"
-            }, b = {
+            }, y = {
                 VISA: "visa",
                 MASTERCARD: "mastercard",
                 AMEX: "amex",
@@ -6523,7 +6524,7 @@ window.spb = function(modules) {
             FALSE: !1
         };
         var LSAT_UPGRADE_EXCLUDED_MERCHANTS = [ "AQipcJ1uXz50maKgYx49lKUB8MlSOXP573M6cpsFpHqDZOqnopsJpfYY7bQC_9CtQJsEhGlk8HLs2oZz", "Aco-yrRKihknb5vDBbDOdtYywjYMEPaM7mQg6kev8VDAz01lLA88J4oAUnF4UV9F_InqkqX7K62_jOjx", "AeAiB9K2rRsTXsFKZt4FMAQ8a6VEu4hijducis3a8NcIjV2J_c5I2H2PYhT3qCOwxT8P4l17skqgBlmg", "AXKrWRqEvxiDoUIZQaD1tFi2QhtmhWve3yTDBi58bxWjieYJ9j73My-yJmM7hP00JvOXu4YD6L2eaI5O", "AfRTnXv_QcuVyalbUxThtgk1xTygygsdevlBUTz36dDgD6XZNHp3Ym99a-mjMaokXyTTiI8VJ9mRgaFB", "AejlsIlg_KjKjmLKqxJqFIAwn3ZP02emx41Z2It4IfirQ-nNgZgzWk1CU-Q1QDbYUXjWoYJZ4dq1S2pK", "AQXD7-m_2yMo-5AxJ1fQaPeEWYDE7NZ9XrLzEXeiPLTHDu9vfe_T0foF8BoX8K5cMfXuRDysUEmhw-8Z" ];
-        var APM_LIST = [ "ideal", "bancontact", "giropay", "sofort", "eps", "mybank", "p24", "payu", "blik", "trustly", "zimpler", "maxima", "oxxo", "boleto", "wechatpay", "mercadopago", "multibanco" ];
+        var APM_LIST = [ "ideal", "bancontact", "giropay", "sofort", "eps", "mybank", "p24", "payu", "blik", "trustly", "zimpler", "maxima", "oxxo", "boleto", "boletobancario", "wechatpay", "mercadopago", "multibanco" ];
         var AUTO_FLUSH_LEVEL = [ "warn", "error" ];
         var LOG_LEVEL_PRIORITY = [ "error", "warn", "info", "debug" ];
         var sendBeacon = function(_ref2) {
@@ -7179,7 +7180,7 @@ window.spb = function(modules) {
             logger_getLogger().info("rest_api_create_order_token");
             var headers = ((_headers15 = {}).authorization = "Bearer " + accessToken, _headers15["paypal-partner-attribution-id"] = partnerAttributionID, 
             _headers15["paypal-client-metadata-id"] = clientMetadataID, _headers15["x-app-name"] = "smart-payment-buttons", 
-            _headers15["x-app-version"] = "5.0.98", _headers15);
+            _headers15["x-app-version"] = "5.0.99", _headers15);
             var paymentSource = {
                 token: {
                     id: paymentMethodID,
@@ -8704,14 +8705,13 @@ window.spb = function(modules) {
                                 var orderID = _ref5.orderID, shippingContact = _ref5.shippingContact, _ref5$shippingMethod = _ref5.shippingMethod, shippingMethod = void 0 === _ref5$shippingMethod ? null : _ref5$shippingMethod, callbackTrigger = _ref5.callbackTrigger;
                                 if (!onShippingChange) {
                                     var _currentShippingMetho, _currentShippingMetho2;
-                                    var update = {
+                                    (update = {
                                         newTotal: {
                                             label: "Total",
                                             amount: currentTotalAmount
                                         },
                                         newLineItems: []
-                                    };
-                                    update.newLineItems = updateNewLineItems({
+                                    }).newLineItems = updateNewLineItems({
                                         shipping: currentShippingAmount,
                                         subtotal: currentSubtotalAmount,
                                         tax: currentTaxAmount,
@@ -8755,22 +8755,22 @@ window.spb = function(modules) {
                                 }(shippingContact), errors = _validateShippingCont.errors, shipping_address = _validateShippingCont.shipping_address;
                                 if (errors && errors.length) {
                                     var _currentShippingMetho3, _currentShippingMetho4;
-                                    var _update = {
+                                    var update;
+                                    (update = {
                                         errors: errors,
                                         newTotal: {
                                             label: "Total",
                                             amount: currentTotalAmount
                                         },
                                         newLineItems: []
-                                    };
-                                    _update.newLineItems = updateNewLineItems({
+                                    }).newLineItems = updateNewLineItems({
                                         shipping: currentShippingAmount,
                                         subtotal: currentSubtotalAmount,
                                         tax: currentTaxAmount,
                                         shippingLabel: null == (_currentShippingMetho3 = currentShippingMethod) ? void 0 : _currentShippingMetho3.label,
                                         shippingDetail: null == (_currentShippingMetho4 = currentShippingMethod) ? void 0 : _currentShippingMetho4.detail
                                     });
-                                    return promise_ZalgoPromise.resolve(_update);
+                                    return promise_ZalgoPromise.resolve(update);
                                 }
                                 var data = {
                                     callbackTrigger: callbackTrigger,
@@ -13419,7 +13419,7 @@ window.spb = function(modules) {
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.98", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.99", 
                     _ref3.button_correlation_id = buttonCorrelationID, _ref3.stickiness_id = isAndroidChrome() ? stickinessID : null, 
                     _ref3.bn_code = partnerAttributionID, _ref3.user_action = commit ? "commit" : "continue", 
                     _ref3.seller_id = merchantID[0], _ref3.merchant_domain = merchantDomain, _ref3.t = Date.now().toString(), 
@@ -13527,7 +13527,7 @@ window.spb = function(modules) {
             });
             var setupExportsTask = function(_ref) {
                 var props = _ref.props, isEnabled = _ref.isEnabled, facilitatorAccessToken = _ref.facilitatorAccessToken, fundingEligibility = _ref.fundingEligibility, merchantID = _ref.merchantID;
-                var _createOrder = props.createOrder, _onApprove = props.onApprove, onError = props.onError, onCancel = props.onCancel, onClick = props.onClick, commit = props.commit, intent = props.intent, fundingSource = props.fundingSource, currency = props.currency;
+                var _createOrder = props.createOrder, _onApprove = props.onApprove, onError = props.onError, onCancel = props.onCancel, onClick = props.onClick, _onShippingChange = props.onShippingChange, commit = props.commit, intent = props.intent, fundingSource = props.fundingSource, currency = props.currency;
                 var fundingSources = querySelectorAll("[data-funding-source]").map((function(el) {
                     return el.getAttribute("data-funding-source");
                 })).filter(Boolean);
@@ -13599,6 +13599,16 @@ window.spb = function(modules) {
                             },
                             getFacilitatorAccessToken: function() {
                                 return facilitatorAccessToken;
+                            },
+                            onShippingChange: function(data) {
+                                if (_onShippingChange) return _onShippingChange(data, {
+                                    resolve: function() {
+                                        throw new Error("Action unimplemented");
+                                    },
+                                    reject: function() {
+                                        throw new Error("Action unimplemented");
+                                    }
+                                });
                             }
                         };
                     }
