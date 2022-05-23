@@ -17,7 +17,7 @@ export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInst
                 clientID,
                 returnurl,
                 customLabel,
-                /* locale, */
+                locale,
                 style = {}
             } = params;
 
@@ -27,6 +27,7 @@ export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInst
             }
 
             const pageHTML = htmlTemplate({
+                locale,
                 cspNonce,
                 style,
                 customLabel,

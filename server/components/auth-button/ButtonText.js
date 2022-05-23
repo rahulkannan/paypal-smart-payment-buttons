@@ -1,5 +1,6 @@
 /* @flow */
-export const buttonContent = {
+
+const logInWithPaypalTextByCountry = {
     ar:      '',
     bg:      '',
     cs:      '',
@@ -38,3 +39,5 @@ export const buttonContent = {
     zh:      '',
     zh_Hant: ''
 };
+
+export const buttonLabelsByLanguage = ({ lang }) => logInWithPaypalTextByCountry[lang] || logInWithPaypalTextByCountry.en;

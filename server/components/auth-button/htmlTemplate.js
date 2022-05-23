@@ -3,6 +3,8 @@
 import { html } from 'jsx-pragmatic';
 import { AuthButton } from '@paypal/identity-components/dist/button';
 
+import { buttonLabelsByLanguage } from './ButtonText'
+
 type htmlTemplateProps = {|
     cspNonce : string,
     style : Object,
@@ -15,9 +17,9 @@ type htmlTemplateProps = {|
 |};
 
 export const htmlTemplate = ({
+    locale,
     cspNonce,
     style,
-    customLabel,
     clientID,
     scopes,
     returnUrl,
@@ -29,7 +31,7 @@ export const htmlTemplate = ({
        ${ sdkMeta.getSDKLoader({ nonce: cspNonce }) }
     </head>
     <body data-nonce="${ cspNonce }" data-client-version="1.1.1" data-render-version="1.1.1">
-    ${ AuthButton({ style, nonce: cspNonce, customLabel }).render(html()) }
+    ${ AuthButton({ style:{ ...style, label: buttonLabelsByLanguage({ lang: locale.lang }) } , nonce: cspNonce }).render(html()) }
     <script nonce="${ cspNonce }">
     document.querySelector('.paypal-auth-button').addEventListener('click', function () {
              function onApproveHandler(data) {
