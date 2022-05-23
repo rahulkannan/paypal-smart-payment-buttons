@@ -341,7 +341,7 @@ const venmoFallbackMiddleware = getNativeFallbackMiddleware({
 
 const buttonsScriptMiddleware = webpackDevMiddleware(webpack(WEBPACK_CONFIG_BUTTONS_LOCAL_DEBUG), { serverSideRender: true });
 
-app.use('/smart/auth-button', defaultMiddleware, buttonsScriptMiddleware, authButtonMiddleware);
+app.use('/smart/auth-button', defaultMiddleware, authButtonMiddleware);
 app.use('/smart/buttons', defaultMiddleware, buttonsScriptMiddleware, buttonMiddleware);
 app.use('/smart/menu', defaultMiddleware, menuMiddleware);
 app.use('/smart/qrcode', defaultMiddleware, qrCodeMiddleware);

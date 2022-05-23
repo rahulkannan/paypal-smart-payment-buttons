@@ -1,11 +1,18 @@
 /* @flow */
 import { clientErrorResponse, htmlResponse, allowFrame, defaultLogger, sdkMiddleware, getCSPNonce, type ExpressMiddleware } from '../../lib';
-/* import { getButtonParams, getButtonPreflightParams } from '../buttons/params'; */
+import type { LoggerType, CacheType, InstanceLocationInformation } from '../../types';
 
 import { htmlTemplate } from './htmlTemplate';
 
-// select locale connect login signup
-export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInstanceLocationInformation }) : ExpressMiddleware {
+
+type AuthButtonMiddlewareOptions = {|
+    logger : LoggerType,
+    cache : CacheType,
+    getInstanceLocationInformation : () => InstanceLocationInformation,
+|};
+
+
+export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInstanceLocationInformation } : AuthButtonMiddlewareOptions) : ExpressMiddleware {
     const locationInformation = getInstanceLocationInformation();
     return sdkMiddleware({ logger, cache, locationInformation }, {
         app: ({ req, res, params, meta }) => {

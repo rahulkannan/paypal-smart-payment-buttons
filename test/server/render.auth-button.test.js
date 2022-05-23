@@ -116,15 +116,18 @@ test('Should pass the props correctly to the window handler.', async () => {
     const status = res.getStatus();
     const html = res.getBody();
 
+    if(!html) {
+        throw new Error(`Error generating button html null or undefined status: ${ status }`);
+    }
+
     if(status !== 200) {
         throw new Error(`Expected status code to be 200, got ${ status }`);
     }
 
-    const tests = Object.keys(query)
-                        .map(k => ({ k, r: html.indexOf(query[k]) }))
-                        .filter(({ r }) => r === -1)
+    const tests = Object.entries(query)
+                        .map(([k, v]) => ({ k, v: html.includes(v) }))
 
-    if (tests.length > 0) {
-        throw new Error(`Expected ${tests.map(({k}) => k).join(',')} query parameters to be passed to the Auth clcik handler`);
+    if (tests.some(({ v }) => !v)) {
+        throw new Error(`Expected ${tests.filter(({ v }) => !v).map(({ k }) => k).join(',')} query parameters to be passed to the Auth clcik handler`);
     }
 });

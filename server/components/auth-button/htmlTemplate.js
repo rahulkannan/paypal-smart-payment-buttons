@@ -5,7 +5,8 @@ import { AuthButton } from '@paypal/identity-components/dist/button';
 
 import { buttonLabelsByLanguage } from './ButtonText'
 
-type htmlTemplateProps = {|
+export type htmlTemplateProps = {|
+    locale : Object,
     cspNonce : string,
     style : Object,
     customLabel : string,
@@ -17,7 +18,7 @@ type htmlTemplateProps = {|
 |};
 
 export const htmlTemplate = ({
-    locale,
+    locale = { lang: 'en' },
     cspNonce,
     style,
     clientID,

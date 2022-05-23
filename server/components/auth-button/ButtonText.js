@@ -1,5 +1,9 @@
 /* @flow */
 
+export type htmlTemplateProps = {|
+    lang : string,
+|};
+
 const logInWithPaypalTextByCountry = {
     ar:      '',
     bg:      '',
@@ -40,4 +44,4 @@ const logInWithPaypalTextByCountry = {
     zh_Hant: ''
 };
 
-export const buttonLabelsByLanguage = ({ lang }) => logInWithPaypalTextByCountry[lang] || logInWithPaypalTextByCountry.en;
+export const buttonLabelsByLanguage = ({ lang } : htmlTemplateProps) : string => logInWithPaypalTextByCountry[lang] || logInWithPaypalTextByCountry.en;
