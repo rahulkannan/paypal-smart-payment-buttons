@@ -96,6 +96,9 @@ test('Should pass the props correctly to the window handler.', async () => {
 
     // These are considered valid (validateButtonProps pass)
     const query = {
+        style: {
+            label: 'Log in'
+        },
         scopes: 'testscope',
         returnurl: 'testredirecturi',
         responseType: 'testresponsetype',
@@ -122,7 +125,7 @@ test('Should pass the props correctly to the window handler.', async () => {
     }
 
     const tests = Object.entries(query)
-                        .map(([k, v]) => ({ k, v: html.includes(v) }))
+                        .map(([k, v]) => ({ k, v: html.includes(typeof v === 'object' ? v.label : v) }))
 
     if (tests.some(({ v }) => !v)) {
         throw new Error(`Expected ${tests.filter(({ v }) => !v).map(({ k }) => k).join(',')} query parameters to be passed to the Auth clcik handler`);
