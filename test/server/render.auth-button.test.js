@@ -1,7 +1,4 @@
 /* @flow */
-
-import { noop } from 'belter';
-
 import { cancelWatchers, getAuthButtonMiddleware  } from '../../server';
 
 import {
@@ -24,11 +21,11 @@ const cache = {
 };
 
 const logger = {
-    debug: noop,
-    info:  noop,
-    warn:  noop,
-    error: noop,
-    track: noop
+    debug: Function.prototype,
+    info: Function.prototype,
+    warn: Function.prototype,
+    error: Function.prototype,
+    track: Function.prototype
 };
 
 test('should do a basic button render and succeed', async () => {
