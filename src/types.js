@@ -6,6 +6,7 @@ import { COUNTRY, LANG, CARD, WALLET_INSTRUMENT, FUNDING } from '@paypal/sdk-con
 import type { ProxyWindow as _ProxyWindow } from '@krakenjs/post-robot/src';
 
 import { CONTEXT, QRCODE_STATE } from './constants';
+import type { OnShippingChangeData } from './props/onShippingChange';
 
 // export something to force webpack to see this as an ES module
 export const TYPES = true;
@@ -47,7 +48,7 @@ export type CheckoutProps = {|
     onComplete : () => ZalgoPromise<void> | void,
     onAuth : ({| accessToken : string |}) => ZalgoPromise<void> | void,
     onCancel : () => ZalgoPromise<void> | void,
-    onShippingChange : ?({| |}, {| resolve : () => ZalgoPromise<void>, reject : () => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
+    onShippingChange : ?(data : OnShippingChangeData, {| resolve : () => ZalgoPromise<void>, reject : () => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
     onError : (mixed) => ZalgoPromise<void> | void,
     onClose : () => ZalgoPromise<void> | void,
     fundingSource : FundingType,

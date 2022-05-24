@@ -9,7 +9,44 @@ import { getLogger } from '../lib';
 
 import type { CreateOrder } from './createOrder';
 
-type SHIPPING_OPTION_TYPE = 'SHIPPING' | 'PICKUP';
+export type SHIPPING_OPTION_TYPE = 'SHIPPING' | 'PICKUP';
+export type ON_SHIPPING_CHANGE_EVENT = 'add' | 'replace';
+
+export type ShippingAmount = {|
+    breakdown? : {|
+        item_total? : {|
+            currency_code : $Values<typeof CURRENCY>,
+            value : string
+        |},
+        shipping? : {|
+            currency_code : $Values<typeof CURRENCY>,
+            value : string
+        |},
+        handling? : {|
+            currency_code : $Values<typeof CURRENCY>,
+            value : string
+        |},
+        tax_total? : {|
+            currency_code : $Values<typeof CURRENCY>,
+            value : string
+        |},
+        insurance? : {|
+            currency_code : $Values<typeof CURRENCY>,
+            value : string
+        |},
+        shipping_discount? : {|
+            currency_code : $Values<typeof CURRENCY>,
+            value : string
+        |},
+        discount? : {|
+            currency_code : $Values<typeof CURRENCY>,
+            value : string
+        |}
+    |},
+    currency_code : $Values<typeof CURRENCY>,
+    value : string
+|};
+
 export type XOnShippingChangeDataType = {|
     orderID? : string,
     paymentID? : string,
@@ -29,7 +66,8 @@ export type XOnShippingChangeDataType = {|
         |}
     |},
     buyerAccessToken? : ?string,
-    forceRestAPI? : boolean
+    forceRestAPI? : boolean,
+    amount? : ShippingAmount
 |};
 
 export type XOnShippingChangeActionsType = {|
