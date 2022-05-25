@@ -15,6 +15,8 @@ import { getOnApprove } from './onApprove';
 import { getOnComplete } from './onComplete';
 import { getOnCancel } from './onCancel';
 import { getOnShippingChange } from './onShippingChange';
+import { getOnShippingAddressChange } from './onShippingAddressChange';
+import { getOnShippingOptionsChange } from './onShippingOptionsChange';
 import { getOnClick } from './onClick';
 import { getCreateBillingAgreement } from './createBillingAgreement';
 import { getCreateSubscription } from './createSubscription';
@@ -22,7 +24,9 @@ import { getOnAuth } from './onAuth';
 import { getOnError } from './onError';
 
 import type { CreateOrder, XCreateOrder, CreateBillingAgreement, XCreateBillingAgreement, OnInit,
-    XOnInit, OnApprove, XOnApprove, OnComplete, XOnComplete, OnCancel, XOnCancel, OnClick, XOnClick, OnShippingChange, XOnShippingChange, XOnError,
+    XOnInit, OnApprove, XOnApprove, OnComplete, XOnComplete, OnCancel, XOnCancel, OnClick, XOnClick,
+    OnShippingChange, XOnShippingChange, OnShippingAddressChange, XOnShippingAddressChange,
+    OnShippingOptionsChange, XOnShippingOptionsChange, XOnError,
     OnError, XGetPopupBridge, GetPopupBridge, XCreateSubscription, RememberFunding, GetPageURL, OnAuth, GetQueriedEligibleFunding
 } from '.';
 

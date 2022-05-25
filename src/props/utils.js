@@ -1,22 +1,42 @@
 /* @flow */
 
-import type { ShippingAmount } from './onShippingChange';
+import type { Breakdown } from './onShippingChange';
 
-export const setShippingBreakdownAmounts = ({ amount = {} } : {| amount : ?ShippingAmount |}) : string => {
+export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : string |} |}) : string => {
     let newAmount = 0;
-    const breakdown = amount?.breakdown || {};
+    const updatedAmountKeys = Object.keys(updatedAmounts) || [];
 
     Object.keys(breakdown).forEach(item => {
-        if (item === 'discount') {
-            newAmount -= parseFloat(breakdown[item]?.value);
-        }
-
         if (item === 'shipping_discount') {
-            newAmount -= parseFloat(breakdown[item]?.value);
+            // don't process
         }
 
-        newAmount += parseFloat(breakdown[item]?.value);
+        if (updatedAmountKeys.indexOf(item) !== -1) {
+            newAmount += parseFloat(updatedAmounts[item]);
+        } else {
+            newAmount += parseFloat(breakdown[item]?.value);
+        }
     });
 
     return newAmount.toFixed(2);
+};
+
+export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : string |} |}) : Breakdown => {
+    const breakdownKeys = Object.keys(breakdown);
+    const updatedAmountKeys = Object.keys(updatedAmounts);
+
+    const currency_code = breakdown[breakdownKeys[0]]?.currency_code;
+
+    updatedAmountKeys.forEach(key => {
+        if (!breakdown[key]) {
+            breakdown[key] = {
+                currency_code,
+                value: updatedAmounts[key]
+            };
+        } else {
+            breakdown[key].value = updatedAmounts[key];
+        }
+    });
+
+    return breakdown;
 };

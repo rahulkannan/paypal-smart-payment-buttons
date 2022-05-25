@@ -8,25 +8,9 @@ import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, LSAT_UPGRADE_EXCLUDED_MERCHANTS, FP
 import { getLogger } from '../lib';
 
 import type { CreateOrder } from './createOrder';
-import type { ShippingAmount, ON_SHIPPING_CHANGE_EVENT } from './onShippingChange';
-import { setShippingBreakdownAmounts } from './utils';
-
-export type Query = {|
-    op : ON_SHIPPING_CHANGE_EVENT,
-    path : string,
-    value : ShippingAmount
-|};
-export type ShippingOption = {|
-    id? : string,
-    label : string,
-    selected : boolean,
-    type : string,
-    amount : {|
-        currency_code : string,
-        value : string
-    |}
-|};
-
+import type { ShippingAmount, ShippingOption, Query, ON_SHIPPING_CHANGE_EVENT } from './onShippingChange';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts } from './utils';
+        
 export type XOnShippingAddressChangeDataType = {|
     orderID? : string,
     paymentID? : string,
@@ -42,7 +26,7 @@ export type XOnShippingAddressChangeDataType = {|
 export type XOnShippingAddressChangeActionsType = {|
     patch : () => ZalgoPromise<OrderResponse>,
     query : () => $ReadOnlyArray<Query>,
-    reject : () => ZalgoPromise<void>,
+    reject : (mixed) => ZalgoPromise<void>,
     updateShippingOptions : ({| shippingOptions : $ReadOnlyArray<ShippingOption> |}) => XOnShippingAddressChangeActionsType,
     updateTax : ({| taxAmount : string |}) => XOnShippingAddressChangeActionsType
 |};
@@ -77,14 +61,17 @@ export function buildXOnShippingAddressChangeData(data : OnShippingAddressChange
     return rest;
 }
 
-export function buildXOnShippingAddressChangeActions({ data, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingAddressChangeData, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingAddressChangeActionsType {
+export function buildXOnShippingAddressChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingAddressChangeData, actions : OnShippingAddressChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingAddressChangeActionsType {
     const patchQueries = [];
 
     const actions = {
-        reject: ZalgoPromise.reject(),
+        reject: passedActions.reject || function reject() {
+            throw new Error(`Missing reject action callback`);
+        },
 
         updateTax: ({ taxAmount }) => {
-            const newAmount = setShippingBreakdownAmounts({ amount: data?.amount });
+            const newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { tax_total: taxAmount } });
+            const breakdown = buildBreakdown({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { tax_total: taxAmount } });
         
             patchQueries.push({
                 op:       data?.event || 'replace', // or 'add' if there are none.
@@ -93,24 +80,7 @@ export function buildXOnShippingAddressChangeActions({ data, orderID, facilitato
                 value: {
                     value:         `${ newAmount }`,
                     currency_code: data?.amount?.currency_code,
-                    breakdown:     {
-                        item_total: {
-                            currency_code: data?.amount?.breakdown?.item_total?.currency_code,
-                            value:         data?.amount?.breakdown?.item_total?.value || '0.00'
-                        },
-                        handling: {
-                            currency_code: data?.amount?.breakdown?.handling?.currency_code,
-                            value:         data?.amount?.breakdown?.handling?.value || '0.00'
-                        },
-                        shipping: {
-                            currency_code: data?.amount?.breakdown?.shipping?.currency_code,
-                            value:         data?.amount?.breakdown?.shipping?.value || '0.00'
-                        },
-                        tax_total: {
-                            currency_code: data?.amount?.breakdown?.tax_total?.currency_code,
-                            value:         `${ taxAmount }`
-                        }
-                    }
+                    breakdown
                 }
             });
 
@@ -122,7 +92,7 @@ export function buildXOnShippingAddressChangeActions({ data, orderID, facilitato
                 op:    data?.event || 'replace', // or 'add' if there are none.
                 // eslint-disable-next-line quotes
                 path:  "/purchase_units/@reference_id=='default'/shipping/options",
-                value: shippingOptions
+                value: shippingOptions || []
             });
             return actions;
         },
@@ -152,7 +122,7 @@ export function getOnShippingAddressChange({ onShippingAddressChange, partnerAtt
     const upgradeLSAT = LSAT_UPGRADE_EXCLUDED_MERCHANTS.indexOf(clientID) === -1;
 
     if (onShippingAddressChange) {
-        return ({ buyerAccessToken, forceRestAPI = upgradeLSAT, ...data }) => {
+        return ({ buyerAccessToken, forceRestAPI = upgradeLSAT, ...data }, actions) => {
             return createOrder().then(orderID => {
                 getLogger()
                     .info('button_shipping_address_change')
@@ -164,7 +134,7 @@ export function getOnShippingAddressChange({ onShippingAddressChange, partnerAtt
                         [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED]: '1'
                     }).flush();
                 
-                return onShippingAddressChange(buildXOnShippingAddressChangeData(data), buildXOnShippingAddressChangeActions({ data, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI }));
+                return onShippingAddressChange(buildXOnShippingAddressChangeData(data), buildXOnShippingAddressChangeActions({ data, actions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI }));
             });
         };
     }
