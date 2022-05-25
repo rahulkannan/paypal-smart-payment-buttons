@@ -1,6 +1,6 @@
 /* @flow */
 
-import { noop, stringifyError } from '@krakenjs/belter/src';
+import { noop, stringifyError, isCrossSiteTrackingEnabled } from '@krakenjs/belter/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
@@ -107,7 +107,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 [FPTI_KEY.PAYMENT_FLOW]:      name,
                 [FPTI_KEY.IS_VAULT]:          instrumentType ? '1' : '0',
                 [FPTI_CUSTOM_KEY.INFO_MSG]:   enableNativeCheckout ? 'tester' : '',
-                [FPTI_CUSTOM_KEY.EXPERIENCE]: experience || ''
+                [FPTI_CUSTOM_KEY.EXPERIENCE]: (!isCrossSiteTrackingEnabled('enforce_policy') && experience) || ''
             }).flush();
 
         const loggingPromise =  ZalgoPromise.try(() => {
