@@ -26,6 +26,7 @@ export type XOnShippingOptionsChangeActionsType = {|
     patch : () => ZalgoPromise<OrderResponse>,
     query : () => $ReadOnlyArray<Query>,
     reject : (mixed) => ZalgoPromise<void>,
+    updateShippingDiscount : ({| discountAmount : string |}) => XOnShippingOptionsChangeActionsType,
     updateShippingOptions : ({| shippingOptions : $ReadOnlyArray<ShippingOption> |}) => XOnShippingOptionsChangeActionsType
 |};
 

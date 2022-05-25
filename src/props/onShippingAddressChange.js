@@ -27,6 +27,7 @@ export type XOnShippingAddressChangeActionsType = {|
     patch : () => ZalgoPromise<OrderResponse>,
     query : () => $ReadOnlyArray<Query>,
     reject : (mixed) => ZalgoPromise<void>,
+    updateShippingDiscount : ({| discountAmount : string |}) => XOnShippingAddressChangeActionsType,
     updateShippingOptions : ({| shippingOptions : $ReadOnlyArray<ShippingOption> |}) => XOnShippingAddressChangeActionsType,
     updateTax : ({| taxAmount : string |}) => XOnShippingAddressChangeActionsType
 |};
