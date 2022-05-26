@@ -1,20 +1,22 @@
 /* @flow */
 
-import type { Breakdown } from './onShippingChange';
+import { type Breakdown, type Query, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
 
-export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : string |} |}) : string => {
+export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedAmounts } : {| breakdown : Breakdown, updatedAmounts : {| [string] : string |} |}) : string => {
     let newAmount = 0;
     const updatedAmountKeys = Object.keys(updatedAmounts) || [];
 
     Object.keys(breakdown).forEach(item => {
-        if (item === 'shipping_discount') {
-            // don't process
-        }
-
         if (updatedAmountKeys.indexOf(item) !== -1) {
             newAmount += parseFloat(updatedAmounts[item]);
         } else {
             newAmount += parseFloat(breakdown[item]?.value);
+        }
+    });
+
+    updatedAmountKeys.forEach(key => {
+        if (!breakdown[key]) {
+            newAmount += parseFloat(updatedAmounts[key]);
         }
     });
 
@@ -39,4 +41,16 @@ export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| brea
     });
 
     return breakdown;
+};
+
+export const convertQueriesToArray = ({ queries } : {| queries : {| [$Values<typeof ON_SHIPPING_CHANGE_PATHS>] : Query |} |}) : $ReadOnlyArray<Query> => {
+    const convertedQueries = [];
+    const patchQueryKeys = Object.keys(queries);
+    if (patchQueryKeys) {
+        patchQueryKeys.forEach(key => {
+            convertedQueries.push(queries[key]);
+        });
+    }
+
+    return convertedQueries;
 };

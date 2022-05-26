@@ -8,7 +8,8 @@ import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, LSAT_UPGRADE_EXCLUDED_MERCHANTS, FP
 import { getLogger } from '../lib';
 
 import type { CreateOrder } from './createOrder';
-import type { ShippingAmount, ShippingOption, Query, ON_SHIPPING_CHANGE_EVENT } from './onShippingChange';
+import { type ShippingAmount, type ShippingOption, type Query, type ON_SHIPPING_CHANGE_EVENT, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
        
 export type XOnShippingOptionsChangeDataType = {|
     orderID? : string,
@@ -61,7 +62,14 @@ export function buildXOnShippingOptionsChangeData(data : OnShippingOptionsChange
 }
 
 export function buildXOnShippingOptionsChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingOptionsChangeData, actions : OnShippingOptionsChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingOptionsChangeActionsType {
-    const patchQueries = [];
+    const patchQueries = {};
+
+    let newAmount;
+    let breakdown = data.amount?.breakdown || {};
+
+    if (Object.keys(breakdown).length === 0) {
+        throw new Error('Must pass breakdown into data attribute for onShippingAddressChange callback.');
+    }
 
     const actions = {
         reject: passedActions.reject || function reject() {
@@ -69,22 +77,38 @@ export function buildXOnShippingOptionsChangeActions({ data, actions: passedActi
         },
 
         updateShippingOptions: ({ shippingOptions }) => {
-            patchQueries.push({
+            patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
                 op:    data?.event || 'replace', // or 'add' if there are none.
-                // eslint-disable-next-line quotes
-                path:  "/purchase_units/@reference_id=='default'/shipping/options",
+                path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
                 value: shippingOptions || []
-            });
+            };
+            return actions;
+        },
+
+        updateShippingDiscount: ({ discountAmount }) => {
+            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { shipping_discount: discountAmount } });
+            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discountAmount } });
+
+            patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
+                op:       'replace',
+                path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
+                value: {
+                    value:         `${ newAmount }`,
+                    currency_code: data?.amount?.currency_code,
+                    breakdown
+                }
+            };
+
             return actions;
         },
 
         patch: () => {
-            return patchOrder(orderID, patchQueries, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI }).catch(() => {
+            return patchOrder(orderID, convertQueriesToArray({ queries: patchQueries }), { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI }).catch(() => {
                 throw new Error('Order could not be patched');
             });
         },
 
-        query: () => patchQueries
+        query: () => convertQueriesToArray({ queries: patchQueries })
 
     };
 

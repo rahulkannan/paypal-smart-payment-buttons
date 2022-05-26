@@ -12,6 +12,13 @@ import type { CreateOrder } from './createOrder';
 export type SHIPPING_OPTION_TYPE = 'SHIPPING' | 'PICKUP';
 export type ON_SHIPPING_CHANGE_EVENT = 'add' | 'replace';
 
+export const ON_SHIPPING_CHANGE_PATHS = {
+    // eslint-disable-next-line quotes
+    AMOUNT:  ("/purchase_units/@reference_id=='default'/amount" : "/purchase_units/@reference_id=='default'/amount"),
+    // eslint-disable-next-line quotes
+    OPTIONS: ("/purchase_units/@reference_id=='default'/shipping/options" : "/purchase_units/@reference_id=='default'/shipping/options")
+};
+
 export type ShippingOption = {|
     id? : string,
     label : string,
