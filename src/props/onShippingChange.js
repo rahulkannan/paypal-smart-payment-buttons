@@ -80,14 +80,7 @@ export type XOnShippingChangeDataType = {|
         country_code : $Values<typeof COUNTRY>,
         postal_code : string
     |},
-    selected_shipping_option? : {|
-        label : string,
-        type : SHIPPING_OPTION_TYPE,
-        amount : {|
-            currency_code : $Values<typeof CURRENCY>,
-            value : string
-        |}
-    |},
+    selected_shipping_option? : ShippingOption,
     buyerAccessToken? : ?string,
     forceRestAPI? : boolean,
     amount? : ShippingAmount
@@ -117,14 +110,7 @@ export type OnShippingChangeData = {|
         country_code : $Values<typeof COUNTRY>,
         postal_code : string
     |},
-    selected_shipping_option? : {|
-        label : string,
-        type : SHIPPING_OPTION_TYPE,
-        amount : {|
-            currency_code : $Values<typeof CURRENCY>,
-            value : string
-        |}
-    |},
+    selected_shipping_option? : ShippingOption,
     buyerAccessToken? : ?string,
     forceRestAPI? : boolean
 |};

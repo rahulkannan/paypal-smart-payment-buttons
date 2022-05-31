@@ -268,16 +268,22 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 }
                 
                 if (data.shipping_address) {
+                    // eslint-disable-next-line no-unused-vars
+                    const { selected_shipping_option, ...filteredData } = data;
+
                     if (!onShippingAddressChange) {
                         getLogger().warn('Must implement onShippingAddressChange to handle address changes.').flush();
                     } else {
-                        return onShippingAddressChange({ buyerAccessToken, ...data }, actions);
+                        return onShippingAddressChange({ buyerAccessToken, ...filteredData }, actions);
                     }
                 } else if (data.selected_shipping_option) {
+                    // eslint-disable-next-line no-unused-vars
+                    const { shipping_address, ...filteredData } = data;
+
                     if (!onShippingOptionsChange) {
                         getLogger().warn('Must implement onShippingOptionsChange to handle shipping options changes.').flush();
                     } else {
-                        return onShippingOptionsChange({ buyerAccessToken, ...data }, actions);
+                        return onShippingOptionsChange({ buyerAccessToken, ...filteredData }, actions);
                     }
                 }
             },
