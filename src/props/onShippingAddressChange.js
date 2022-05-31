@@ -8,7 +8,7 @@ import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, LSAT_UPGRADE_EXCLUDED_MERCHANTS, FP
 import { getLogger } from '../lib';
 
 import type { CreateOrder } from './createOrder';
-import { type ShippingAmount, type ShippingOption, type Query, type ON_SHIPPING_CHANGE_EVENT, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
+import { type ShippingAmount, type ShippingOption, type ON_SHIPPING_CHANGE_EVENT, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
 import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
         
 export type XOnShippingAddressChangeDataType = {|
@@ -25,11 +25,11 @@ export type XOnShippingAddressChangeDataType = {|
 
 export type XOnShippingAddressChangeActionsType = {|
     patch : () => ZalgoPromise<OrderResponse>,
-    query : () => $ReadOnlyArray<Query>,
+    query : () => string,
     reject : (mixed) => ZalgoPromise<void>,
-    updateShippingDiscount : ({| discountAmount : string |}) => XOnShippingAddressChangeActionsType,
-    updateShippingOptions : ({| shippingOptions : $ReadOnlyArray<ShippingOption> |}) => XOnShippingAddressChangeActionsType,
-    updateTax : ({| taxAmount : string |}) => XOnShippingAddressChangeActionsType
+    updateShippingDiscount : ({| discount : string |}) => XOnShippingAddressChangeActionsType,
+    updateShippingOptions : ({| options : $ReadOnlyArray<ShippingOption> |}) => XOnShippingAddressChangeActionsType,
+    updateTax : ({| tax : string |}) => XOnShippingAddressChangeActionsType
 |};
 
 export type XOnShippingAddressChange = (XOnShippingAddressChangeDataType, XOnShippingAddressChangeActionsType) => ZalgoPromise<void>;
@@ -69,7 +69,7 @@ export function buildXOnShippingAddressChangeActions({ data, actions: passedActi
     let breakdown = data.amount?.breakdown || {};
 
     if (Object.keys(breakdown).length === 0) {
-        throw new Error('Must pass breakdown into data attribute for onShippingAddressChange callback.');
+        throw new Error('Must pass amount with breakdown into data attribute for onShippingAddressChange callback.');
     }
 
     const actions = {
@@ -77,9 +77,9 @@ export function buildXOnShippingAddressChangeActions({ data, actions: passedActi
             throw new Error(`Missing reject action callback`);
         },
 
-        updateTax: ({ taxAmount }) => {
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { tax_total: taxAmount } });
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { tax_total: taxAmount } });
+        updateTax: ({ tax }) => {
+            breakdown = buildBreakdown({ breakdown, updatedAmounts: { tax_total: tax } });
+            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { tax_total: tax } });
         
             patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
                 op:       'replace',
@@ -94,19 +94,19 @@ export function buildXOnShippingAddressChangeActions({ data, actions: passedActi
             return actions;
         },
 
-        updateShippingOptions: ({ shippingOptions }) => {
+        updateShippingOptions: ({ options }) => {
             patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
                 op:    data?.event || 'replace', // or 'add' if there are none.
                 path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                value: shippingOptions || []
+                value: options || []
             };
 
             return actions;
         },
 
-        updateShippingDiscount: ({ discountAmount }) => {
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping_discount: discountAmount } });
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discountAmount } });
+        updateShippingDiscount: ({ discount }) => {
+            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping_discount: discount } });
+            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discount } });
 
             patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
                 op:       'replace',
@@ -127,7 +127,7 @@ export function buildXOnShippingAddressChangeActions({ data, actions: passedActi
             });
         },
 
-        query: () => convertQueriesToArray({ queries: patchQueries })
+        query: () => JSON.stringify(convertQueriesToArray({ queries: patchQueries }))
 
     };
 

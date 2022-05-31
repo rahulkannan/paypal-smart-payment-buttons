@@ -33,6 +33,8 @@ import './card-fields';
 import './data';
 import './menu';
 import './props-utils';
+import './onShippingAddressChange';
+import './onShippingOptionsChange';
 
 beforeEach(() => {
     setupMocks();

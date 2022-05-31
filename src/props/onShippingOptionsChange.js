@@ -1,34 +1,29 @@
 /* @flow */
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { COUNTRY, FPTI_KEY } from '@paypal/sdk-constants/src';
+import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
 import { patchOrder, type OrderResponse } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, LSAT_UPGRADE_EXCLUDED_MERCHANTS, FPTI_CUSTOM_KEY } from '../constants';
 import { getLogger } from '../lib';
 
 import type { CreateOrder } from './createOrder';
-import { type ShippingAmount, type ShippingOption, type Query, type ON_SHIPPING_CHANGE_EVENT, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
+import { type ShippingAmount, type ShippingOption, type ON_SHIPPING_CHANGE_EVENT, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
 import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
        
 export type XOnShippingOptionsChangeDataType = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    shipping_address? : {|
-        city : string,
-        state : string,
-        country_code : $Values<typeof COUNTRY>,
-        postal_code : string
-    |}
+    selected_shipping_option? : ShippingOption
 |};
 
 export type XOnShippingOptionsChangeActionsType = {|
     patch : () => ZalgoPromise<OrderResponse>,
-    query : () => $ReadOnlyArray<Query>,
+    query : () => string,
     reject : (mixed) => ZalgoPromise<void>,
-    updateShippingDiscount : ({| discountAmount : string |}) => XOnShippingOptionsChangeActionsType,
-    updateShippingOptions : ({| shippingOptions : $ReadOnlyArray<ShippingOption> |}) => XOnShippingOptionsChangeActionsType
+    updateShippingDiscount : ({| discount : string |}) => XOnShippingOptionsChangeActionsType,
+    updateShippingOptions : ({| options : $ReadOnlyArray<ShippingOption> |}) => XOnShippingOptionsChangeActionsType
 |};
 
 export type XOnShippingOptionsChange = (XOnShippingOptionsChangeDataType, XOnShippingOptionsChangeActionsType) => ZalgoPromise<void>;
@@ -37,12 +32,7 @@ export type OnShippingOptionsChangeData = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    shipping_address? : {|
-        city : string,
-        state : string,
-        country_code : $Values<typeof COUNTRY>,
-        postal_code : string
-    |},
+    selected_shipping_option? : ShippingOption,
     amount? : ShippingAmount,
     event? : ON_SHIPPING_CHANGE_EVENT,
     buyerAccessToken? : ?string,
@@ -76,18 +66,18 @@ export function buildXOnShippingOptionsChangeActions({ data, actions: passedActi
             throw new Error(`Missing reject action callback`);
         },
 
-        updateShippingOptions: ({ shippingOptions }) => {
+        updateShippingOptions: ({ options }) => {
             patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
                 op:    data?.event || 'replace', // or 'add' if there are none.
                 path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                value: shippingOptions || []
+                value: options || []
             };
             return actions;
         },
 
-        updateShippingDiscount: ({ discountAmount }) => {
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { shipping_discount: discountAmount } });
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discountAmount } });
+        updateShippingDiscount: ({ discount }) => {
+            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { shipping_discount: discount } });
+            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discount } });
 
             patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
                 op:       'replace',
@@ -108,7 +98,7 @@ export function buildXOnShippingOptionsChangeActions({ data, actions: passedActi
             });
         },
 
-        query: () => convertQueriesToArray({ queries: patchQueries })
+        query: () => JSON.stringify(convertQueriesToArray({ queries: patchQueries }))
 
     };
 
