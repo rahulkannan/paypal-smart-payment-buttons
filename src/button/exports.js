@@ -34,8 +34,9 @@ export function setupExports({ props, isEnabled, facilitatorAccessToken, funding
         },
         currency,
         intent,
-        isGuestEnabled: () => { return fundingEligibility?.card?.hasOwnProperty('guestEnabled') ? fundingEligibility.card.guestEnabled : getGuestEnabledStatus(merchantID); },
-        paymentSession: () => {
+        isGuestEnabled:          () => { return fundingEligibility?.card?.hasOwnProperty('guestEnabled') ? fundingEligibility.card.guestEnabled : getGuestEnabledStatus(merchantID); },
+        isShippingChangeEnabled: () => { return (typeof onShippingChange === 'function'); },
+        paymentSession:          () => {
             return {
                 getAvailableFundingSources: () => fundingSources,
                 createOrder:                () => {
