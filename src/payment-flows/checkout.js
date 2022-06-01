@@ -262,29 +262,32 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 });
             },
 
-            onShippingChange: (data, actions) => {
-                if (onShippingChange) {
+            onShippingChange: onShippingChange
+                ? (data, actions) => {
                     return onShippingChange({ buyerAccessToken, ...data }, actions);
+                } : null,
+
+            onShippingAddressChange: (data, actions) => {
+                if (!data.shipping_address) {
+                    getLogger().warn('Must pass shipping_address in data to handle changes in shipping address.').flush();
                 }
-                
-                if (data.shipping_address) {
-                    // eslint-disable-next-line no-unused-vars
-                    const { selected_shipping_option, ...filteredData } = data;
 
-                    if (!onShippingAddressChange) {
-                        getLogger().warn('Must implement onShippingAddressChange to handle address changes.').flush();
-                    } else {
-                        return onShippingAddressChange({ buyerAccessToken, ...filteredData }, actions);
-                    }
-                } else if (data.selected_shipping_option) {
-                    // eslint-disable-next-line no-unused-vars
-                    const { shipping_address, ...filteredData } = data;
+                if (!onShippingAddressChange) {
+                    getLogger().warn('Must implement onShippingAddressChange to handle address changes.').flush();
+                } else {
+                    return onShippingAddressChange({ buyerAccessToken, ...data }, actions);
+                }
+            },
 
-                    if (!onShippingOptionsChange) {
-                        getLogger().warn('Must implement onShippingOptionsChange to handle shipping options changes.').flush();
-                    } else {
-                        return onShippingOptionsChange({ buyerAccessToken, ...filteredData }, actions);
-                    }
+            onShippingOptionsChange: (data, actions) => {
+                if (!data.selected_shipping_option) {
+                    getLogger().warn('Must pass selected_shipping_option in data to handle changes in shipping options.').flush();
+                }
+
+                if (!onShippingOptionsChange) {
+                    getLogger().warn('Must implement onShippingAddressChange to handle address changes.').flush();
+                } else {
+                    return onShippingOptionsChange({ buyerAccessToken, ...data }, actions);
                 }
             },
 

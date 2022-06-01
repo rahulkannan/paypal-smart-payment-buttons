@@ -132,7 +132,7 @@ describe('onShippingAddressChange', () => {
                         }
 
                         return renderToOriginal(...args).then(() => {
-                            return props.onShippingChange({
+                            return props.onShippingAddressChange({
                                 orderID,
                                 amount,
                                 shipping_address,
@@ -201,7 +201,7 @@ describe('onShippingAddressChange', () => {
                         }
 
                         return renderToOriginal(...args).then(() => {
-                            return props.onShippingChange({
+                            return props.onShippingAddressChange({
                                 orderID,
                                 amount,
                                 shipping_address,
@@ -270,7 +270,7 @@ describe('onShippingAddressChange', () => {
                         }
 
                         return renderToOriginal(...args).then(() => {
-                            return props.onShippingChange({
+                            return props.onShippingAddressChange({
                                 orderID,
                                 amount,
                                 shipping_address,
@@ -340,11 +340,77 @@ describe('onShippingAddressChange', () => {
                         }
 
                         return renderToOriginal(...args).then(() => {
-                            return props.onShippingChange({
+                            return props.onShippingAddressChange({
                                 orderID,
                                 amount,
                                 shipping_address,
                             }, { reject: avoid('reject') });
+                        });
+                    });
+                }));
+
+                return checkoutInstance;
+            }));
+
+            createButtonHTML();
+
+            await mockSetupButton({
+                facilitatorAccessToken,
+                merchantID:                    [ 'XYZ12345' ],
+                fundingEligibility:            DEFAULT_FUNDING_ELIGIBILITY,
+                personalization:               {},
+                buyerCountry:                  COUNTRY.US,
+                isCardFieldsExperimentEnabled: false
+            });
+
+            await clickButton(FUNDING.PAYPAL);
+        });
+    });
+
+    it('should allow merchant to pass back specified error to application through sdk for display', async () => {
+        return await wrapPromise(async ({ expect }) => {
+
+            const orderID = uniqueID();
+            const accessToken = uniqueID();
+            const payerID = 'YYYYYYYYYY';
+            const facilitatorAccessToken = uniqueID();
+
+            window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
+                return ZalgoPromise.try(() => {
+                    return orderID;
+                });
+            }));
+
+            window.xprops.onShippingAddressChange = mockAsyncProp(expect('onShippingAddressChange', async (data, actions) => {
+                actions.reject(data.errors.ADDRESS);
+            }));
+
+            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {
+                props.onAuth({ accessToken });
+                mockFunction(props, 'onApprove', expect('onApprove', ({ original: onApproveOriginal, args: [ data, actions ] }) => {
+                    return onApproveOriginal({ ...data, payerID }, actions);
+                }));
+
+                const checkoutInstance = CheckoutOriginal(props);
+
+                mockFunction(checkoutInstance, 'renderTo', expect('renderTo', async ({ original: renderToOriginal, args }) => {
+                    return props.createOrder().then(id => {
+                        if (id !== orderID) {
+                            throw new Error(`Expected orderID to be ${ orderID }, got ${ id }`);
+                        }
+
+                        return renderToOriginal(...args).then(() => {
+                            return props.onShippingAddressChange({
+                                orderID,
+                                amount,
+                                shipping_address
+                            }, { reject: expect('reject', (error) => {
+                                const expectedError = "Your order can't be shipped to this address.";
+
+                                if (error !== expectedError) {
+                                    throw new Error(`Expected error message to be, ${ expectedError }, but was ${ error }`);
+                                }
+                            }) });
                         });
                     });
                 }));

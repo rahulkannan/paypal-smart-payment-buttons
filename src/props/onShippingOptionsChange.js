@@ -8,20 +8,27 @@ import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, LSAT_UPGRADE_EXCLUDED_MERCHANTS, FP
 import { getLogger } from '../lib';
 
 import type { CreateOrder } from './createOrder';
-import { type ShippingAmount, type ShippingOption, type ON_SHIPPING_CHANGE_EVENT, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
+import {
+    type ShippingAmount,
+    type ShippingOption,
+    type ON_SHIPPING_CHANGE_EVENT,
+    ON_SHIPPING_CHANGE_PATHS,
+    SHIPPING_OPTIONS_ERROR_MESSAGE
+} from './onShippingChange';
 import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
        
 export type XOnShippingOptionsChangeDataType = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    selected_shipping_option? : ShippingOption
+    selected_shipping_option? : ShippingOption,
+    errors : typeof SHIPPING_OPTIONS_ERROR_MESSAGE
 |};
 
 export type XOnShippingOptionsChangeActionsType = {|
     patch : () => ZalgoPromise<OrderResponse>,
     query : () => string,
-    reject : (mixed) => ZalgoPromise<void>,
+    reject : (string) => ZalgoPromise<void>,
     updateShippingDiscount : ({| discount : string |}) => XOnShippingOptionsChangeActionsType,
     updateShippingOptions : ({| options : $ReadOnlyArray<ShippingOption> |}) => XOnShippingOptionsChangeActionsType
 |};
@@ -41,14 +48,14 @@ export type OnShippingOptionsChangeData = {|
         
 export type OnShippingOptionsChangeActionsType = {|
     resolve : () => ZalgoPromise<void>,
-    reject : () => ZalgoPromise<void>
+    reject : (string) => ZalgoPromise<void>
 |};
             
 export function buildXOnShippingOptionsChangeData(data : OnShippingOptionsChangeData) : XOnShippingOptionsChangeDataType {
     // eslint-disable-next-line no-unused-vars
     const { amount, buyerAccessToken, event, forceRestAPI, ...rest } = data;
 
-    return rest;
+    return { ...rest, errors: SHIPPING_OPTIONS_ERROR_MESSAGE };
 }
 
 export function buildXOnShippingOptionsChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingOptionsChangeData, actions : OnShippingOptionsChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingOptionsChangeActionsType {

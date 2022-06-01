@@ -17,6 +17,18 @@ export const ON_SHIPPING_CHANGE_PATHS = {
     OPTIONS: ("/purchase_units/@reference_id=='default'/shipping/options" : "/purchase_units/@reference_id=='default'/shipping/options")
 };
 
+export const SHIPPING_ADDRESS_ERROR_MESSAGE = {
+    ADDRESS: ("Your order can't be shipped to this address." : "Your order can't be shipped to this address."),
+    COUNTRY: ("Your order can't be shipped to this country." : "Your order can't be shipped to this country."),
+    STATE :  ("Your order can't be shipped to this state." : "Your order can't be shipped to this state."),
+    ZIP:     ("Your order can't be shipped to this zip." : "Your order can't be shipped to this zip.")
+};
+
+export const SHIPPING_OPTIONS_ERROR_MESSAGE = {
+    METHOD_UNAVAILABLE: `The shipping method you chose is unavailable. To continue, choose another way to get your order.`,
+    STORE_UNAVAILABLE:  `Part of your order isn't available at this store.`
+};
+
 export type ShippingOption = {|
     id? : string,
     label : string,
@@ -88,7 +100,7 @@ export type XOnShippingChangeDataType = {|
 
 export type XOnShippingChangeActionsType = {|
     resolve : () => ZalgoPromise<void>,
-    reject : (mixed) => ZalgoPromise<void>,
+    reject : (string) => ZalgoPromise<void>,
     order : {|
         patch : () => ZalgoPromise<OrderResponse>
     |}
@@ -117,7 +129,7 @@ export type OnShippingChangeData = {|
 
 export type OnShippingChangeActionsType = {|
     resolve : () => ZalgoPromise<void>,
-    reject : () => ZalgoPromise<void>
+    reject : (string) => ZalgoPromise<void>
 |};
 
 export function buildXShippingChangeActions({ orderID, actions, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| orderID : string, actions : OnShippingChangeActionsType, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingChangeActionsType {

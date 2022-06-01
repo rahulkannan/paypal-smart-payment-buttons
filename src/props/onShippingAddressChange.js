@@ -8,7 +8,13 @@ import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, LSAT_UPGRADE_EXCLUDED_MERCHANTS, FP
 import { getLogger } from '../lib';
 
 import type { CreateOrder } from './createOrder';
-import { type ShippingAmount, type ShippingOption, type ON_SHIPPING_CHANGE_EVENT, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
+import {
+    type ShippingAmount,
+    type ShippingOption,
+    type ON_SHIPPING_CHANGE_EVENT,
+    ON_SHIPPING_CHANGE_PATHS,
+    SHIPPING_ADDRESS_ERROR_MESSAGE
+} from './onShippingChange';
 import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
         
 export type XOnShippingAddressChangeDataType = {|
@@ -20,13 +26,14 @@ export type XOnShippingAddressChangeDataType = {|
         state : string,
         country_code : $Values<typeof COUNTRY>,
         postal_code : string
-    |}
+    |},
+    errors : typeof SHIPPING_ADDRESS_ERROR_MESSAGE
 |};
 
 export type XOnShippingAddressChangeActionsType = {|
     patch : () => ZalgoPromise<OrderResponse>,
     query : () => string,
-    reject : (mixed) => ZalgoPromise<void>,
+    reject : (string) => ZalgoPromise<void>,
     updateShippingDiscount : ({| discount : string |}) => XOnShippingAddressChangeActionsType,
     updateShippingOptions : ({| options : $ReadOnlyArray<ShippingOption> |}) => XOnShippingAddressChangeActionsType,
     updateTax : ({| tax : string |}) => XOnShippingAddressChangeActionsType
@@ -52,14 +59,14 @@ export type OnShippingAddressChangeData = {|
         
 export type OnShippingAddressChangeActionsType = {|
     resolve : () => ZalgoPromise<void>,
-    reject : () => ZalgoPromise<void>
+    reject : (string) => ZalgoPromise<void>
 |};
             
 export function buildXOnShippingAddressChangeData(data : OnShippingAddressChangeData) : XOnShippingAddressChangeDataType {
     // eslint-disable-next-line no-unused-vars
     const { amount, buyerAccessToken, event, forceRestAPI, ...rest } = data;
 
-    return rest;
+    return { ...rest, errors: SHIPPING_ADDRESS_ERROR_MESSAGE };
 }
 
 export function buildXOnShippingAddressChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingAddressChangeData, actions : OnShippingAddressChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingAddressChangeActionsType {
