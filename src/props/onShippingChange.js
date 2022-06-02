@@ -113,6 +113,7 @@ export function buildXOnShippingChangeData(data : XOnShippingChangeDataType) : X
 }
 
 export type OnShippingChangeData = {|
+    amount? : ShippingAmount,
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,

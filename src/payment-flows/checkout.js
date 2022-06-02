@@ -267,29 +267,23 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     return onShippingChange({ buyerAccessToken, ...data }, actions);
                 } : null,
 
-            onShippingAddressChange: (data, actions) => {
-                if (!data.shipping_address) {
-                    getLogger().warn('Must pass shipping_address in data to handle changes in shipping address.').flush();
-                }
-
-                if (!onShippingAddressChange) {
-                    getLogger().warn('Must implement onShippingAddressChange to handle address changes.').flush();
-                } else {
+            onShippingAddressChange: onShippingAddressChange
+                ? (data, actions) => {
+                    if (!data.shipping_address) {
+                        throw new Error('Must pass shipping_address in data to handle changes in shipping address.');
+                    }
+                    
                     return onShippingAddressChange({ buyerAccessToken, ...data }, actions);
-                }
-            },
+                } : null,
 
-            onShippingOptionsChange: (data, actions) => {
-                if (!data.selected_shipping_option) {
-                    getLogger().warn('Must pass selected_shipping_option in data to handle changes in shipping options.').flush();
-                }
-
-                if (!onShippingOptionsChange) {
-                    getLogger().warn('Must implement onShippingAddressChange to handle address changes.').flush();
-                } else {
-                    return onShippingOptionsChange({ buyerAccessToken, ...data }, actions);
-                }
-            },
+            onShippingOptionsChange: onShippingOptionsChange
+                ? (data, actions) => {
+                    if (!data.selected_shipping_option) {
+                        throw new Error('Must pass selected_shipping_option in data to handle changes in shipping options.');
+                    } else {
+                        return onShippingOptionsChange({ buyerAccessToken, ...data }, actions);
+                    }
+                } : null,
 
             onClose: () => {
                 if (doApproveOnClose && !approved) {
