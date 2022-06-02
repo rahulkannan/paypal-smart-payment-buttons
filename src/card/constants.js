@@ -59,7 +59,6 @@ export const FIELD_STYLE : FieldStyle = {
     backgroundColor:         'background-color',
     background:              'background',
     appearance:              'appearance',
-    boxShadow:               'box-shadow',
     direction:               'direction',
     font:                    'font',
     fontFamily:              'font-family',

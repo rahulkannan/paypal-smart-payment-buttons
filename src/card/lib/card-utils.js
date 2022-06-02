@@ -207,17 +207,15 @@ export function styleToString(style : Object = { }) : string {
     ), '');
 }
 
-// Destructures nested style objects
-export function getStyles(style : Object) : [Object, Object] {
-    // $FlowFixMe
-    return Object.keys(style).reduce((acc : [{| |}, {| |}], key : string) => {
-        if (typeof style[key] === 'object') {
-            acc[0][key] = style[key];
-        } else {
-            acc[1][key] = style[key];
+export function mergeStyles(defaultStyle: Object, generalStyle: Object) : Object {
+    let composedStyle = JSON.parse(JSON.stringify(defaultStyle));
+    Object.keys(generalStyle).forEach(selector => {
+        if(!composedStyle[selector]){
+            composedStyle[selector] = {};
         }
-        return acc;
-    }, [ {}, {} ]);
+        Object.assign(composedStyle[selector], generalStyle[selector])
+    })
+    return composedStyle
 }
 
 export function removeNonDigits(value : string) : string {

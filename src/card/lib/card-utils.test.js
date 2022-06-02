@@ -1,5 +1,6 @@
 /* @flow */
 
+import { redirect } from '@krakenjs/belter/src';
 import { getActiveElement } from '../../lib/dom';
 
 import {
@@ -8,7 +9,7 @@ import {
     formatDate,
     parseGQLErrors,
     styleToString,
-    getStyles,
+    mergeStyles,
     filterExtraFields
 } from './card-utils';
 
@@ -387,27 +388,39 @@ describe('card utils', () => {
 
     });
 
-    describe('getStyles', () => {
-        it('should separate nested sub-styles into their own style objects', () => {
-            const objectStyle = {
-                'height':          '60px',
-                'padding':         '10px',
-                'fontSize':        '18px',
-                'fontFamily':      '"Open Sans", sans-serif',
-                'transition':        'all 0.5s ease-out',
-                'input.invalid': {
-                    color: 'red'
-                }
-            };
-
-            const [ generalStyle, inputStyle ] = getStyles(objectStyle);
-
-            expect(Object.keys(generalStyle).length).toBe(1);
-            expect(generalStyle['input.invalid'].color).toBe('red');
-
-            expect(Object.keys(inputStyle).length).toBe(5);
-            expect(inputStyle.height).toBe('60px');
-
+    describe('mergeStyles', () => {
+        it('Should merge the syle object passed by the merchant into the default style object', () => {
+           const defaultStyles = {
+               'input': {
+                    'border': 'none',
+                    'color': 'red',
+                    'height': '100%',
+                    'width': '100%'   
+               }
+           };
+           const styles = {
+            'input': {
+                'font-size': '16px',
+                'font-family': 'sans-serif',
+                'font-weight': 'lighter',
+                'color': 'blue',
+            },
+           }
+           const mergedStyles = mergeStyles(defaultStyles, styles)
+           const expectedStyles = {
+            'input': {
+                'font-size': '16px',
+                'font-family': 'sans-serif',
+                'font-weight': 'lighter',
+                'color': 'blue',
+                'border': 'none',
+                'height': '100%',
+                'width': '100%', 
+            } 
+           }
+           expect(Object.keys(mergedStyles[input]).length).toBe(7);
+           expect(mergedStyles.input.color).toBe('blue');
+           expect(mergedStyles).toEqual(expectedStyles);
         });
     });
 
