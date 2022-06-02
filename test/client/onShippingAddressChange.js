@@ -382,7 +382,7 @@ describe('onShippingAddressChange', () => {
             }));
 
             window.xprops.onShippingAddressChange = mockAsyncProp(expect('onShippingAddressChange', async (data, actions) => {
-                actions.reject(data.errors.ADDRESS);
+                actions.reject(data.errors.ADDRESS_ERROR);
             }));
 
             mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {

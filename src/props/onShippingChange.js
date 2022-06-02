@@ -18,10 +18,10 @@ export const ON_SHIPPING_CHANGE_PATHS = {
 };
 
 export const SHIPPING_ADDRESS_ERROR_MESSAGE = {
-    ADDRESS: ("Your order can't be shipped to this address." : "Your order can't be shipped to this address."),
-    COUNTRY: ("Your order can't be shipped to this country." : "Your order can't be shipped to this country."),
-    STATE :  ("Your order can't be shipped to this state." : "Your order can't be shipped to this state."),
-    ZIP:     ("Your order can't be shipped to this zip." : "Your order can't be shipped to this zip.")
+    ADDRESS_ERROR: ("Your order can't be shipped to this address." : "Your order can't be shipped to this address."),
+    COUNTRY_ERROR: ("Your order can't be shipped to this country." : "Your order can't be shipped to this country."),
+    STATE_ERROR :  ("Your order can't be shipped to this state." : "Your order can't be shipped to this state."),
+    ZIP_ERROR:     ("Your order can't be shipped to this zip." : "Your order can't be shipped to this zip.")
 };
 
 export const SHIPPING_OPTIONS_ERROR_MESSAGE = {
