@@ -13,7 +13,7 @@ import {
     type ShippingOption,
     type ON_SHIPPING_CHANGE_EVENT,
     ON_SHIPPING_CHANGE_PATHS,
-    SHIPPING_ADDRESS_ERROR_MESSAGE
+    SHIPPING_ADDRESS_ERROR_MESSAGES
 } from './onShippingChange';
 import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
         
@@ -27,7 +27,7 @@ export type XOnShippingAddressChangeDataType = {|
         country_code : $Values<typeof COUNTRY>,
         postal_code : string
     |},
-    errors : typeof SHIPPING_ADDRESS_ERROR_MESSAGE
+    errors : typeof SHIPPING_ADDRESS_ERROR_MESSAGES
 |};
 
 export type XOnShippingAddressChangeActionsType = {|
@@ -66,7 +66,7 @@ export function buildXOnShippingAddressChangeData(data : OnShippingAddressChange
     // eslint-disable-next-line no-unused-vars
     const { amount, buyerAccessToken, event, forceRestAPI, ...rest } = data;
 
-    return { ...rest, errors: SHIPPING_ADDRESS_ERROR_MESSAGE };
+    return { ...rest, errors: SHIPPING_ADDRESS_ERROR_MESSAGES };
 }
 
 export function buildXOnShippingAddressChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingAddressChangeData, actions : OnShippingAddressChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingAddressChangeActionsType {

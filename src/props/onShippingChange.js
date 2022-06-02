@@ -17,14 +17,14 @@ export const ON_SHIPPING_CHANGE_PATHS = {
     OPTIONS: ("/purchase_units/@reference_id=='default'/shipping/options" : "/purchase_units/@reference_id=='default'/shipping/options")
 };
 
-export const SHIPPING_ADDRESS_ERROR_MESSAGE = {
+export const SHIPPING_ADDRESS_ERROR_MESSAGES = {
     ADDRESS_ERROR: ("Your order can't be shipped to this address." : "Your order can't be shipped to this address."),
     COUNTRY_ERROR: ("Your order can't be shipped to this country." : "Your order can't be shipped to this country."),
     STATE_ERROR :  ("Your order can't be shipped to this state." : "Your order can't be shipped to this state."),
     ZIP_ERROR:     ("Your order can't be shipped to this zip." : "Your order can't be shipped to this zip.")
 };
 
-export const SHIPPING_OPTIONS_ERROR_MESSAGE = {
+export const SHIPPING_OPTIONS_ERROR_MESSAGES = {
     METHOD_UNAVAILABLE: `The shipping method you chose is unavailable. To continue, choose another way to get your order.`,
     STORE_UNAVAILABLE:  `Part of your order isn't available at this store.`
 };

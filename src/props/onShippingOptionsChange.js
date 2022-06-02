@@ -13,7 +13,7 @@ import {
     type ShippingOption,
     type ON_SHIPPING_CHANGE_EVENT,
     ON_SHIPPING_CHANGE_PATHS,
-    SHIPPING_OPTIONS_ERROR_MESSAGE
+    SHIPPING_OPTIONS_ERROR_MESSAGES
 } from './onShippingChange';
 import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
        
@@ -22,7 +22,7 @@ export type XOnShippingOptionsChangeDataType = {|
     paymentID? : string,
     paymentToken? : string,
     selected_shipping_option? : ShippingOption,
-    errors : typeof SHIPPING_OPTIONS_ERROR_MESSAGE
+    errors : typeof SHIPPING_OPTIONS_ERROR_MESSAGES
 |};
 
 export type XOnShippingOptionsChangeActionsType = {|
@@ -55,7 +55,7 @@ export function buildXOnShippingOptionsChangeData(data : OnShippingOptionsChange
     // eslint-disable-next-line no-unused-vars
     const { amount, buyerAccessToken, event, forceRestAPI, ...rest } = data;
 
-    return { ...rest, errors: SHIPPING_OPTIONS_ERROR_MESSAGE };
+    return { ...rest, errors: SHIPPING_OPTIONS_ERROR_MESSAGES };
 }
 
 export function buildXOnShippingOptionsChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingOptionsChangeData, actions : OnShippingOptionsChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingOptionsChangeActionsType {
