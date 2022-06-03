@@ -20,6 +20,7 @@ export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInst
             const cspNonce = getCSPNonce(res);
             const {
                 scopes,
+                buttonType,
                 responseType,
                 clientID,
                 returnurl,
@@ -35,6 +36,7 @@ export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInst
 
             const pageHTML = htmlTemplate({
                 locale,
+                buttonType,
                 cspNonce,
                 style,
                 customLabel,

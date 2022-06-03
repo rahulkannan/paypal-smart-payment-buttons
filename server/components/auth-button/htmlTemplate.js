@@ -3,10 +3,9 @@
 import { html } from 'jsx-pragmatic';
 import { AuthButton } from '@paypal/identity-components/dist/button';
 
-import { buttonLabelsByLanguage } from './ButtonText'
-
 export type htmlTemplateProps = {|
     locale : Object,
+    buttonType : string,
     cspNonce : string,
     style : Object,
     customLabel : string,
@@ -19,6 +18,7 @@ export type htmlTemplateProps = {|
 
 export const htmlTemplate = ({
     locale = { lang: 'en' },
+    buttonType = 'logIn',
     cspNonce,
     style,
     clientID,
@@ -32,7 +32,7 @@ export const htmlTemplate = ({
        ${ sdkMeta.getSDKLoader({ nonce: cspNonce }) }
     </head>
     <body data-nonce="${ cspNonce }" data-client-version="1.1.1" data-render-version="1.1.1">
-    ${ AuthButton({ style:{ ...style, label: buttonLabelsByLanguage({ lang: locale.lang }) } , nonce: cspNonce }).render(html()) }
+    ${ AuthButton({ style , nonce: cspNonce, locale, buttonType }).render(html()) }
     <script nonce="${ cspNonce }">
     document.querySelector('.paypal-auth-button').addEventListener('click', function () {
              function onApproveHandler(data) {
@@ -49,7 +49,7 @@ export const htmlTemplate = ({
                  });
              }
 
-             const { close, renderTo } = window.paypal.Auth({
+             var authWindow = window.paypal.Auth({
                  client_id: '${ clientID }',
                  scope: '${ scopes }',
                  redirect_uri: '${ returnUrl }',
@@ -59,10 +59,10 @@ export const htmlTemplate = ({
                  onApprove: onApproveHandler,
                  onCancel: onCancelHandler,
              });
-             // save the pop-up "method" into local var
-             popUpClose = close;
-             renderTo(window.parent);
-         });
+        // save the pop-up "method" into local var
+        var popUpClose = authWindow.close;
+        authWindow.renderTo(window.parent);
+    });
         </script>
     </body>
     `
