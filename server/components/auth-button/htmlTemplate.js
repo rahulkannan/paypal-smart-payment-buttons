@@ -1,9 +1,9 @@
 /* @flow */
 /** @jsx node */
 import { html } from 'jsx-pragmatic';
-import { AuthButton } from '@paypal/identity-components/dist/button';
 
 export type htmlTemplateProps = {|
+    AuthButton : string,
     locale : Object,
     buttonType : string,
     cspNonce : string,
@@ -17,6 +17,7 @@ export type htmlTemplateProps = {|
 |};
 
 export const htmlTemplate = ({
+    AuthButton,
     locale = { lang: 'en' },
     buttonType = 'logIn',
     cspNonce,
@@ -29,7 +30,7 @@ export const htmlTemplate = ({
 } : htmlTemplateProps) : string => (
     `<!DOCTYPE html style="height:100%;">
     <head>
-       ${ sdkMeta.getSDKLoader({ nonce: cspNonce }) }
+    ${ sdkMeta.getSDKLoader({ nonce: cspNonce }) }
     </head>
     <body data-nonce="${ cspNonce }" data-client-version="1.1.1" data-render-version="1.1.1">
     ${ AuthButton({ style , nonce: cspNonce, locale, buttonType }).render(html()) }

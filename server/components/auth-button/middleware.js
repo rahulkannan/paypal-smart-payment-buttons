@@ -2,6 +2,7 @@
 import { clientErrorResponse, htmlResponse, allowFrame, defaultLogger, sdkMiddleware, getCSPNonce, type ExpressMiddleware } from '../../lib';
 import type { LoggerType, CacheType, InstanceLocationInformation } from '../../types';
 
+import { getPayPalAuthButtonsRenderScript } from './script';
 import { htmlTemplate } from './htmlTemplate';
 
 
@@ -11,11 +12,10 @@ type AuthButtonMiddlewareOptions = {|
     getInstanceLocationInformation : () => InstanceLocationInformation,
 |};
 
-
 export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInstanceLocationInformation } : AuthButtonMiddlewareOptions) : ExpressMiddleware {
     const locationInformation = getInstanceLocationInformation();
     return sdkMiddleware({ logger, cache, locationInformation }, {
-        app: ({ req, res, params, meta }) => {
+        app: async ({ req, res, params, meta, logBuffer }) => {
             logger.info(req, 'auth_button');
             const cspNonce = getCSPNonce(res);
             const {
@@ -34,7 +34,15 @@ export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInst
                 return clientErrorResponse(res, 'Please provide a clientID query parameter');
             }
 
+            const script = await getPayPalAuthButtonsRenderScript({
+                logBuffer,
+                cache,
+                locationInformation,
+                sdkLocationInformation: {},
+            });
+            logger.info(req, `auth_button script version ${script.version}`);
             const pageHTML = htmlTemplate({
+                AuthButton: script.button.AuthButton,
                 locale,
                 buttonType,
                 cspNonce,
