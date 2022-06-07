@@ -1,6 +1,6 @@
 /* @flow */
 /** @jsx node */
-import { html } from 'jsx-pragmatic';
+import { html } from '@krakenjs/jsx-pragmatic';
 
 export type htmlTemplateProps = {|
     AuthButton : Function,
