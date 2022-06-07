@@ -2,6 +2,7 @@
 import { getPayPalSDKWatcher } from '../../watchers';
 import type { CacheType, InstanceLocationInformation, SDKLocationInformation } from '../../types';
 import { type LoggerBufferType } from '../../lib';
+import { LATEST_TAG, IDENTITY_COMPONENTS_MODULE } from '../../config/config';
 
 type GetPayPalAuthButtonsRenderScriptOptions = {|
     logBuffer : ?LoggerBufferType,
@@ -25,9 +26,9 @@ export type AuthButtonRenderScript = {|
 export async function getPayPalAuthButtonsRenderScript({ logBuffer, cache, locationInformation, sdkLocationInformation }  : GetPayPalAuthButtonsRenderScriptOptions) : Promise<AuthButtonRenderScript> {
     const { getTag, getDeployTag, importDependency } = getPayPalSDKWatcher({ logBuffer, cache, locationInformation, sdkLocationInformation });
     const { version } = await getTag();
-    const button = await importDependency('@paypal/identity-components', 'dist/button.js', 'latest');
+    const button = await importDependency(IDENTITY_COMPONENTS_MODULE, 'dist/button.js', LATEST_TAG);
 
-    // non-blocking download of the DEPLOY_TAG
+    // downloads and logs the deploy tag DEPLOY_TAG
     getDeployTag().catch(Function.prototype);
 
     return { button, version };

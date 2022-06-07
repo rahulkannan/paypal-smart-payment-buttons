@@ -5,7 +5,7 @@ import { poll } from '@krakenjs/grabthar';
 import type { CacheType, InstanceLocationInformation, SDKLocationInformation } from './types';
 import type { LoggerBufferType } from './lib';
 import { SDK_RELEASE_MODULE, SMART_BUTTONS_MODULE, MODULE_POLL_INTERVAL, SMART_BUTTONS_CDN_NAMESPACE,
-    SDK_CDN_NAMESPACE, CHECKOUT_COMPONENTS_MODULE, LATEST_TAG, ACTIVE_TAG } from './config';
+         SDK_CDN_NAMESPACE, CHECKOUT_COMPONENTS_MODULE, IDENTITY_COMPONENTS_MODULE, LATEST_TAG, ACTIVE_TAG } from './config';
 
 let paypalSDKWatcher;
 let paypalSmartButtonsWatcher;
@@ -58,7 +58,7 @@ export function getPayPalSDKWatcher({ logBuffer, cache, locationInformation, sdk
         name:         SDK_RELEASE_MODULE,
         tags:         [ LATEST_TAG, sdkActiveTag ],
         period:       MODULE_POLL_INTERVAL,
-        childModules: [ CHECKOUT_COMPONENTS_MODULE ],
+        childModules: [ CHECKOUT_COMPONENTS_MODULE, IDENTITY_COMPONENTS_MODULE ],
         flat:         true,
         dependencies: true,
         logger:       logBuffer,

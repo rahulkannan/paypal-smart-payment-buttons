@@ -3,7 +3,7 @@
 import { html } from 'jsx-pragmatic';
 
 export type htmlTemplateProps = {|
-    AuthButton : string,
+    AuthButton : Function,
     locale : Object,
     buttonType : string,
     cspNonce : string,

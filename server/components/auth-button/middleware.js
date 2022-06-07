@@ -16,7 +16,6 @@ export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInst
     const locationInformation = getInstanceLocationInformation();
     return sdkMiddleware({ logger, cache, locationInformation }, {
         app: async ({ req, res, params, meta, logBuffer }) => {
-            logger.info(req, 'auth_button');
             const cspNonce = getCSPNonce(res);
             const {
                 scopes,
@@ -33,12 +32,15 @@ export function getAuthButtonMiddleware({ logger = defaultLogger, cache, getInst
                 logger.info(req, 'smart_buttons_render');
                 return clientErrorResponse(res, 'Please provide a clientID query parameter');
             }
-
+            logger.info(req, `auth_button clientID: ${clientID}`);
             const script = await getPayPalAuthButtonsRenderScript({
                 logBuffer,
                 cache,
                 locationInformation,
-                sdkLocationInformation: {},
+                sdkLocationInformation: {
+                    sdkCDNRegistry: undefined,
+                    sdkActiveTag: undefined
+                },
             });
             logger.info(req, `auth_button script version ${script.version}`);
             const pageHTML = htmlTemplate({

@@ -288,8 +288,7 @@ const buttonMiddleware = getButtonMiddleware({
 const authButtonMiddleware = getAuthButtonMiddleware({
     cache,
     logger,
-    getInstanceLocationInformation,
-    getSDKLocationInformation
+    getInstanceLocationInformation
 });
 
 const menuMiddleware = getMenuMiddleware({
