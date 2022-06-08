@@ -13,25 +13,20 @@ import { isLocalOrTest, compileWebpack, babelRequire, resolveScript, evalRequire
 
 const ROOT = join(__dirname, '../../..');
 
-export type NativePopupClientScript = {|
-    script : string,
-    version : string
-|};
-
-export async function compileNativePopupClientScript() : Promise<?NativePopupClientScript> {
+export async function compileNativePopupClientScript() : Promise<?string> {
     const webpackScriptPath = resolveScript(join(ROOT, WEBPACK_CONFIG));
 
     if (webpackScriptPath && isLocalOrTest()) {
         const { WEBPACK_CONFIG_NATIVE_POPUP_DEBUG } = babelRequire(webpackScriptPath);
         const script = await compileWebpack(WEBPACK_CONFIG_NATIVE_POPUP_DEBUG, ROOT);
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 
     const distScriptPath = resolveScript(join(SMART_BUTTONS_MODULE, NATIVE_POPUP_CLIENT_JS));
 
     if (distScriptPath) {
         const script = readFileSync(distScriptPath).toString();
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 }
 
@@ -43,7 +38,7 @@ type GetNativePopupClientScriptOptions = {|
     spbVersionManager : SDKVersionManager
 |};
 
-export async function getNativePopupClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativePopupClientScriptOptions = {}) : Promise<NativePopupClientScript> {
+export async function getNativePopupClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativePopupClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileNativePopupClientScript();
         if (script) {
@@ -65,11 +60,8 @@ export async function getNativePopupClientScript({ logBuffer, cache, debug = fal
 }
 
 export type NativePopupRenderScript = {|
-    popup : {|
-        // eslint-disable-next-line no-undef
-        NativePopup : <T>({| fundingSource : $Values<typeof FUNDING>, cspNonce : string |}) => T
-    |},
-    version : string
+    // eslint-disable-next-line no-undef
+    NativePopup : <T>({| fundingSource : $Values<typeof FUNDING>, cspNonce : string |}) => T
 |};
 
 
@@ -88,14 +80,14 @@ async function getLocalNativePopupRenderScript() : Promise<?NativePopupRenderScr
         const dir = dirname(webpackScriptPath);
         const { WEBPACK_CONFIG_NATIVE_POPUP } = babelRequire(webpackScriptPath);
         const popup = evalRequireScript(await compileWebpack(WEBPACK_CONFIG_NATIVE_POPUP, dir));
-        return { popup, version: ENV.LOCAL };
+        return popup;
     }
 
     const distScriptPath = resolveScript(join(SMART_BUTTONS_MODULE, NATIVE_POPUP_CLIENT_JS));
 
     if (distScriptPath) {
         const popup = dynamicRequire(distScriptPath);
-        return { popup, version: ENV.LOCAL };
+        return popup;
     }
 }
 
@@ -120,25 +112,20 @@ export async function getNativePopupRenderScript({ logBuffer, cache, debug, useL
     })
 }
 
-export type NativeFallbackClientScript = {|
-    script : string,
-    version : string
-|};
-
-export async function compileNativeFallbackClientScript() : Promise<?NativeFallbackClientScript> {
+export async function compileNativeFallbackClientScript() : Promise<?string> {
     const webpackScriptPath = resolveScript(join(ROOT, WEBPACK_CONFIG));
 
     if (webpackScriptPath && isLocalOrTest()) {
         const { WEBPACK_CONFIG_NATIVE_FALLBACK_DEBUG } = babelRequire(webpackScriptPath);
         const script = await compileWebpack(WEBPACK_CONFIG_NATIVE_FALLBACK_DEBUG, ROOT);
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 
     const distScriptPath = resolveScript(join(SMART_BUTTONS_MODULE, NATIVE_FALLBACK_CLIENT_JS));
 
     if (distScriptPath) {
         const script = readFileSync(distScriptPath).toString();
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 }
 
@@ -150,7 +137,7 @@ type GetNativeFallbackClientScriptOptions = {|
     spbVersionManager : SDKVersionManager
 |};
 
-export async function getNativeFallbackClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativeFallbackClientScriptOptions = {}) : Promise<NativeFallbackClientScript> {
+export async function getNativeFallbackClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativeFallbackClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileNativeFallbackClientScript();
         if (script) {
@@ -172,11 +159,8 @@ export async function getNativeFallbackClientScript({ logBuffer, cache, debug = 
 }
 
 export type NativeFallbackRenderScript = {|
-    fallback : {|
-        // eslint-disable-next-line no-undef
-        NativeFallback : <T>({| fundingSource : $Values<typeof FUNDING>, cspNonce : string |}) => T
-    |},
-    version : string
+    // eslint-disable-next-line no-undef
+    NativeFallback : <T>({| fundingSource : $Values<typeof FUNDING>, cspNonce : string |}) => T
 |};
 
 
@@ -195,14 +179,14 @@ async function getLocalNativeFallbackRenderScript() : Promise<?NativeFallbackRen
         const dir = dirname(webpackScriptPath);
         const { WEBPACK_CONFIG_NATIVE_FALLBACK } = babelRequire(webpackScriptPath);
         const fallback = evalRequireScript(await compileWebpack(WEBPACK_CONFIG_NATIVE_FALLBACK, dir));
-        return { fallback, version: ENV.LOCAL };
+        return fallback;
     }
 
     const distScriptPath = resolveScript(join(SMART_BUTTONS_MODULE, NATIVE_FALLBACK_CLIENT_JS));
 
     if (distScriptPath) {
         const fallback = dynamicRequire(distScriptPath);
-        return { fallback, version: ENV.LOCAL };
+        return fallback;
     }
 }
 

@@ -4,7 +4,6 @@ import { join, dirname } from 'path';
 import { readFileSync } from 'fs';
 
 import { importDependency, getFile } from '@krakenjs/grabthar'
-import { ENV } from '@paypal/sdk-constants';
 
 import type { CacheType,  SDKVersionManager } from '../../types';
 import { BUTTON_RENDER_JS, BUTTON_CLIENT_JS, SMART_BUTTONS_MODULE, CHECKOUT_COMPONENTS_MODULE,
@@ -73,25 +72,20 @@ export async function getPayPalSmartPaymentButtonsRenderScript({ logBuffer, cach
     });
 }
 
-export type SmartPaymentButtonsClientScript = {|
-    script : string,
-    version : string
-|};
-
-export async function compileLocalSmartButtonsClientScript() : Promise<?SmartPaymentButtonsClientScript> {
+export async function compileLocalSmartButtonsClientScript() : Promise<?string> {
     const webpackScriptPath = resolveScript(join(ROOT, WEBPACK_CONFIG));
 
     if (webpackScriptPath && isLocalOrTest()) {
         const { WEBPACK_CONFIG_BUTTONS_DEBUG } = babelRequire(webpackScriptPath);
         const script = await compileWebpack(WEBPACK_CONFIG_BUTTONS_DEBUG, ROOT);
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 
     const distScriptPath = resolveScript(join(SMART_BUTTONS_MODULE, BUTTON_CLIENT_JS));
 
     if (distScriptPath) {
         const script = readFileSync(distScriptPath).toString();
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 }
 
@@ -103,7 +97,7 @@ type GetSmartPaymentButtonsClientScriptOptions = {|
     spbVersionManager : SDKVersionManager
 |};
 
-export async function getSmartPaymentButtonsClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartPaymentButtonsClientScriptOptions = {}) : Promise<SmartPaymentButtonsClientScript> {
+export async function getSmartPaymentButtonsClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartPaymentButtonsClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileLocalSmartButtonsClientScript();
         if (script) {

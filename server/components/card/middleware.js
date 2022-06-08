@@ -2,7 +2,7 @@
 
 import { clientErrorResponse, htmlResponse, allowFrame, defaultLogger, safeJSON, sdkMiddleware,
     isLocalOrTest, type ExpressMiddleware } from '../../lib';
-import type { LoggerType, CacheType, ExpressRequest, InstanceLocationInformation } from '../../types';
+import type { LoggerType, CacheType, ExpressRequest, SDKVersionManager } from '../../types';
 import type { SetupCardOptions } from '../../../src/card/types';
 
 
@@ -15,22 +15,22 @@ type CardMiddlewareOptions = {|
     cache? : CacheType,
     cdn? : boolean,
     getAccessToken : (ExpressRequest, string) => Promise<string>,
-    getInstanceLocationInformation : () => InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
-export function getCardMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), getAccessToken, getInstanceLocationInformation } : CardMiddlewareOptions = {}) : ExpressMiddleware {
+export function getCardMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), getAccessToken, spbVersionManager } : CardMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
-    const locationInformation = getInstanceLocationInformation();
 
-    return sdkMiddleware({ logger, cache, locationInformation }, {
+    return sdkMiddleware({ logger }, {
         app: async ({ req, res, params, meta, logBuffer }) => {
             logger.info(req, EVENT.RENDER);
 
             const { clientID, cspNonce, debug } = getParams(params, req, res);
             
-            const client = await getSmartCardClientScript({ debug, logBuffer, cache, useLocal, locationInformation });
+            const clientScript = await getSmartCardClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
+            const spbVersion = spbVersionManager.getLiveVersion()
 
-            logger.info(req, `card_client_version_${ client.version }`);
+            logger.info(req, `card_client_version_${ spbVersion }`);
             logger.info(req, `card_params`, { params: JSON.stringify(params) });
 
             if (!clientID) {
@@ -50,9 +50,9 @@ export function getCardMiddleware({ logger = defaultLogger, cache, cdn = !isLoca
             const pageHTML = `
                 <!DOCTYPE html>
                 <head></head>
-                <body data-nonce="${ cspNonce }" data-client-version="${ client.version }">
+                <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }">
                     ${ meta.getSDKLoader({ nonce: cspNonce }) }
-                    <script nonce="${ cspNonce }">${ client.script }</script>
+                    <script nonce="${ cspNonce }">${ clientScript }</script>
                     <script nonce="${ cspNonce }">smartCard.setupCard(${ safeJSON(cardSetupOptions) })</script>
                 </body>
             `;

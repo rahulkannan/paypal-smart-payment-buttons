@@ -2,7 +2,7 @@
 
 import { clientErrorResponse, htmlResponse, allowFrame, defaultLogger, safeJSON, sdkMiddleware,
     isLocalOrTest, type ExpressMiddleware } from '../../lib';
-import type { LoggerType, CacheType, InstanceLocationInformation } from '../../types';
+import type { LoggerType, CacheType, SDKVersionManager } from '../../types';
 
 import { EVENT } from './constants';
 import { getParams } from './params';
@@ -12,22 +12,22 @@ type MenuMiddlewareOptions = {|
     logger? : LoggerType,
     cache? : CacheType,
     cdn? : boolean,
-    getInstanceLocationInformation : () => InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
-export function getMenuMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), getInstanceLocationInformation } : MenuMiddlewareOptions = {}) : ExpressMiddleware {
+export function getMenuMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), spbVersionManager } : MenuMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
-    const locationInformation = getInstanceLocationInformation();
 
-    return sdkMiddleware({ logger, cache, locationInformation }, {
+    return sdkMiddleware({ logger }, {
         app: async ({ req, res, params, meta, logBuffer }) => {
             logger.info(req, EVENT.RENDER);
 
             const { clientID, cspNonce, debug } = getParams(params, req, res);
             
-            const client = await getSmartMenuClientScript({ debug, logBuffer, cache, useLocal, locationInformation });
+            const clientScript = await getSmartMenuClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
+            const spbVersion = spbVersionManager.getLiveVersion()
 
-            logger.info(req, `menu_client_version_${ client.version }`);
+            logger.info(req, `menu_client_version_${ spbVersion }`);
             logger.info(req, `menu_params`, { params: JSON.stringify(params) });
 
             if (!clientID) {
@@ -37,9 +37,9 @@ export function getMenuMiddleware({ logger = defaultLogger, cache, cdn = !isLoca
             const pageHTML = `
                 <!DOCTYPE html>
                 <head></head>
-                <body data-nonce="${ cspNonce }" data-client-version="${ client.version }">
+                <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }">
                     ${ meta.getSDKLoader({ nonce: cspNonce }) }
-                    <script nonce="${ cspNonce }">${ client.script }</script>
+                    <script nonce="${ cspNonce }">${ clientScript }</script>
                     <script nonce="${ cspNonce }">spb.setupMenu(${ safeJSON({ cspNonce }) })</script>
                 </body>
             `;

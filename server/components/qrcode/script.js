@@ -4,7 +4,6 @@ import { join } from 'path';
 import { readFileSync } from 'fs';
 
 import { getFile } from '@krakenjs/grabthar';
-import { ENV } from '@paypal/sdk-constants';
 
 import type { CacheType, SDKVersionManager } from '../../types';
 import { QRCODE_CLIENT_JS, QRCODE_CLIENT_MIN_JS, WEBPACK_CONFIG, SMART_BUTTONS_MODULE } from '../../config';
@@ -12,25 +11,20 @@ import { isLocalOrTest, compileWebpack, babelRequire, resolveScript, type Logger
 
 const ROOT = join(__dirname, '../../..');
 
-type SmartQRCodeClientScript = {|
-    script : string,
-    version : string
-|};
-
-export async function compileLocalSmartQRCodeClientScript() : Promise<?SmartQRCodeClientScript> {
+export async function compileLocalSmartQRCodeClientScript() : Promise<?string> {
     const webpackScriptPath = resolveScript(join(ROOT, WEBPACK_CONFIG));
 
     if (webpackScriptPath && isLocalOrTest()) {
         const { WEBPACK_CONFIG_QRCODE_DEBUG } = babelRequire(webpackScriptPath);
         const script = await compileWebpack(WEBPACK_CONFIG_QRCODE_DEBUG, ROOT);
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 
     const distScriptPath = resolveScript(join(SMART_BUTTONS_MODULE, QRCODE_CLIENT_JS));
 
     if (distScriptPath) {
         const script = readFileSync(distScriptPath).toString();
-        return { script, version: ENV.LOCAL };
+        return script;
     }
 }
 
@@ -42,7 +36,7 @@ type GetSmartQRCodeClientScriptOptions = {|
     spbVersionManager : SDKVersionManager
 |};
 
-export async function getSmartQRCodeClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartQRCodeClientScriptOptions = {}) : Promise<SmartQRCodeClientScript> {
+export async function getSmartQRCodeClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartQRCodeClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileLocalSmartQRCodeClientScript();
 

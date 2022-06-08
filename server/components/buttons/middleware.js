@@ -8,7 +8,7 @@ import { clientErrorResponse, htmlResponse, allowFrame, defaultLogger, safeJSON,
     graphQLBatch, type GraphQL, javascriptResponse, emptyResponse, promiseTimeout, isLocalOrTest, getDefaultExperiments, type GetExperimentsParams, type GetExperimentsType } from '../../lib';
 import { resolveFundingEligibility, resolveMerchantID, resolveWallet, resolvePersonalization } from '../../service';
 import { EXPERIMENT_TIMEOUT, TIMEOUT_ERROR_MESSAGE, FPTI_STATE } from '../../config';
-import type { LoggerType, CacheType, ExpressRequest, FirebaseConfig, InstanceLocationInformation, SDKLocationInformation, SDKVersionManager } from '../../types';
+import type { LoggerType, CacheType, ExpressRequest, FirebaseConfig, SDKLocationInformation, SDKVersionManager } from '../../types';
 import type { ContentType } from '../../../src/types';
 
 import { getSmartPaymentButtonsClientScript, getPayPalSmartPaymentButtonsRenderScript } from './script';
@@ -31,10 +31,10 @@ type ButtonMiddlewareOptions = {|
     tracking : (ExpressRequest) => void,
     getPersonalizationEnabled : (ExpressRequest) => boolean,
     cdn? : boolean,
-    getInstanceLocationInformation : () => InstanceLocationInformation,
     getSDKLocationInformation : (req : ExpressRequest, env : string) => Promise<SDKLocationInformation>,
     getExperiments? : (req : ExpressRequest, params : GetExperimentsParams) => Promise<GetExperimentsType>,
-    sdkVersionManager: SDKVersionManager
+    sdkVersionManager: SDKVersionManager,
+    spbVersionManager: SDKVersionManager
 |};
 
 export function getButtonMiddleware({
@@ -48,16 +48,14 @@ export function getButtonMiddleware({
     firebaseConfig,
     tracking,
     getPersonalizationEnabled = () => false,
-    getInstanceLocationInformation,
     getSDKLocationInformation,
     getExperiments = getDefaultExperiments,
     sdkVersionManager,
+    spbVersionManager,
 } : ButtonMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
 
-    const locationInformation = getInstanceLocationInformation();
-
-    return sdkMiddleware({ logger, cache, locationInformation }, {
+    return sdkMiddleware({ logger }, {
         app: async ({ req, res, params, meta, logBuffer, sdkMeta }) => {
             logger.info(req, 'smart_buttons_render');
             const middlewareStartTime = Date.now();
@@ -86,7 +84,7 @@ export function getButtonMiddleware({
 
             const facilitatorAccessTokenPromise = getAccessToken(req, clientID);
             const merchantIDPromise = facilitatorAccessTokenPromise.then(facilitatorAccessToken => resolveMerchantID(req, { merchantID: sdkMerchantID, getMerchantID, facilitatorAccessToken }));
-            const clientPromise = getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, locationInformation });
+            const clientPromise = getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
             const renderPromise = getPayPalSmartPaymentButtonsRenderScript({
                 sdkCDNRegistry: sdkLocationInformation?.sdkCDNRegistry,
                 cache,
@@ -95,6 +93,7 @@ export function getButtonMiddleware({
                 sdkVersionManager
             });
             const sdkVersion = sdkVersionManager.getLiveVersion();
+            const spbVersion = spbVersionManager.getLiveVersion()
 
             const fundingEligibilityPromise = resolveFundingEligibility(req, gqlBatch, {
                 logger, clientID, merchantID: sdkMerchantID, buttonSessionID, currency, intent, commit, vault,
@@ -128,7 +127,7 @@ export function getButtonMiddleware({
             }
 
             const renderButton = await renderPromise;
-            const client = await clientPromise;
+            const clientScript = await clientPromise;
             const merchantID = await merchantIDPromise;
             const wallet = await walletPromise;
             const personalization = await personalizationPromise;
@@ -152,7 +151,7 @@ export function getButtonMiddleware({
             };
 
             logger.info(req, `button_render_version_${ sdkVersion }`);
-            logger.info(req, `button_client_version_${ client.version }`);
+            logger.info(req, `button_client_version_${ spbVersion }`);
 
             const buttonProps = {
                 ...params,
@@ -213,13 +212,13 @@ export function getButtonMiddleware({
                       }
                     </script>
                 </head>
-                <body data-nonce="${ cspNonce }" data-client-version="${ client.version }" data-render-version="${ sdkVersion }" data-response-start-time="${ responseStartTime }">
+                <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }" data-render-version="${ sdkVersion }" data-response-start-time="${ responseStartTime }">
                     <style nonce="${ cspNonce }">${ buttonStyle }</style>
 
                     <div id="buttons-container" class="buttons-container" role="main" aria-label="PayPal">${ buttonHTML }</div>
 
                     ${ meta.getSDKLoader({ nonce: cspNonce }) }
-                    <script nonce="${ cspNonce }">${ client.script }</script>
+                    <script nonce="${ cspNonce }">${ clientScript }</script>
                     <script nonce="${ cspNonce }">spb.setupButton(${ safeJSON(setupParams) })</script>
                 </body>
             `;
@@ -230,7 +229,7 @@ export function getButtonMiddleware({
                     name:                  rootTransactionName,
                     client_id:             clientID,
                     sdk_version:           sdkVersion,
-                    smart_buttons_version: client.version
+                    smart_buttons_version: spbVersion
                 }
             });
             allowFrame(res);
@@ -241,7 +240,7 @@ export function getButtonMiddleware({
             logger.info(req, 'smart_buttons_script_render');
 
             const { debug } = getButtonParams(params, req, res);
-            const { script } = await getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, locationInformation });
+            const script = await getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
 
             return javascriptResponse(res, script);
         },
