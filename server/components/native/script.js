@@ -3,14 +3,13 @@
 import { join, dirname } from 'path';
 import { readFileSync } from 'fs';
 
-import { noop } from '@krakenjs/belter';
+import { getFile, importParent } from '@krakenjs/grabthar';
 import { ENV, FUNDING } from '@paypal/sdk-constants';
 
-import type { CacheType, InstanceLocationInformation } from '../../types';
+import type { CacheType, SDKVersionManager } from '../../types';
 import { NATIVE_POPUP_CLIENT_JS, NATIVE_POPUP_CLIENT_MIN_JS, NATIVE_FALLBACK_CLIENT_JS,
-    NATIVE_FALLBACK_CLIENT_MIN_JS, SMART_BUTTONS_MODULE, WEBPACK_CONFIG, ACTIVE_TAG } from '../../config';
+    NATIVE_FALLBACK_CLIENT_MIN_JS, SMART_BUTTONS_MODULE, WEBPACK_CONFIG } from '../../config';
 import { isLocalOrTest, compileWebpack, babelRequire, resolveScript, evalRequireScript, dynamicRequire, type LoggerBufferType } from '../../lib';
-import { getPayPalSmartPaymentButtonsWatcher } from '../../watchers';
 
 const ROOT = join(__dirname, '../../..');
 
@@ -41,10 +40,10 @@ type GetNativePopupClientScriptOptions = {|
     logBuffer : ?LoggerBufferType,
     cache : ?CacheType,
     useLocal? : boolean,
-    locationInformation : InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
-export async function getNativePopupClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), locationInformation } : GetNativePopupClientScriptOptions = {}) : Promise<NativePopupClientScript> {
+export async function getNativePopupClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativePopupClientScriptOptions = {}) : Promise<NativePopupClientScript> {
     if (useLocal) {
         const script = await compileNativePopupClientScript();
         if (script) {
@@ -52,14 +51,17 @@ export async function getNativePopupClientScript({ logBuffer, cache, debug = fal
         }
     }
 
-    const { getTag, getDeployTag, read } = getPayPalSmartPaymentButtonsWatcher({ logBuffer, cache, locationInformation });
-    const { version } = await getTag();
-    const script = await read(debug ? NATIVE_POPUP_CLIENT_JS : NATIVE_POPUP_CLIENT_MIN_JS, ACTIVE_TAG);
+    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+        flat:         true,
+        dependencies: false,
+        logger:       logBuffer,
+        cache
+    })
 
-    // non-blocking download of the DEPLOY_TAG
-    getDeployTag().catch(noop);
-
-    return { script, version };
+    return getFile({
+        moduleDetails,
+        path: debug ? NATIVE_POPUP_CLIENT_JS : NATIVE_POPUP_CLIENT_MIN_JS
+    })
 }
 
 export type NativePopupRenderScript = {|
@@ -76,7 +78,7 @@ type GetNativePopupRenderScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    locationInformation : InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
 async function getLocalNativePopupRenderScript() : Promise<?NativePopupRenderScript> {
@@ -97,7 +99,7 @@ async function getLocalNativePopupRenderScript() : Promise<?NativePopupRenderScr
     }
 }
 
-export async function getNativePopupRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), locationInformation } : GetNativePopupRenderScriptOptions = {}) : Promise<NativePopupRenderScript> {
+export async function getNativePopupRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), spbVersionManager } : GetNativePopupRenderScriptOptions = {}) : Promise<NativePopupRenderScript> {
     if (useLocal) {
         const script = await getLocalNativePopupRenderScript();
         if (script) {
@@ -105,14 +107,17 @@ export async function getNativePopupRenderScript({ logBuffer, cache, debug, useL
         }
     }
 
-    const { getTag, getDeployTag, import: watcherImport } = getPayPalSmartPaymentButtonsWatcher({ logBuffer, cache, locationInformation });
-    const { version } = await getTag();
-    const popup = await watcherImport(debug ? NATIVE_POPUP_CLIENT_JS : NATIVE_POPUP_CLIENT_MIN_JS, ACTIVE_TAG);
+    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+        flat:         true,
+        dependencies: false,
+        logger:       logBuffer,
+        cache
+    })
 
-    // non-blocking download of the DEPLOY_TAG
-    getDeployTag().catch(noop);
-
-    return { popup, version };
+    return importParent({
+        moduleDetails,
+        path: debug ? NATIVE_POPUP_CLIENT_JS : NATIVE_POPUP_CLIENT_MIN_JS
+    })
 }
 
 export type NativeFallbackClientScript = {|
@@ -142,10 +147,10 @@ type GetNativeFallbackClientScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    locationInformation : InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
-export async function getNativeFallbackClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), locationInformation } : GetNativeFallbackClientScriptOptions = {}) : Promise<NativeFallbackClientScript> {
+export async function getNativeFallbackClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativeFallbackClientScriptOptions = {}) : Promise<NativeFallbackClientScript> {
     if (useLocal) {
         const script = await compileNativeFallbackClientScript();
         if (script) {
@@ -153,14 +158,17 @@ export async function getNativeFallbackClientScript({ logBuffer, cache, debug = 
         }
     }
 
-    const { getTag, getDeployTag, read } = getPayPalSmartPaymentButtonsWatcher({ logBuffer, cache, locationInformation });
-    const { version } = await getTag();
-    const script = await read(debug ? NATIVE_FALLBACK_CLIENT_JS : NATIVE_FALLBACK_CLIENT_MIN_JS, ACTIVE_TAG);
+    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+        flat:         true,
+        dependencies: false,
+        logger:       logBuffer,
+        cache
+    })
 
-    // non-blocking download of the DEPLOY_TAG
-    getDeployTag().catch(noop);
-
-    return { script, version };
+    return getFile({
+        moduleDetails,
+        path: debug ? NATIVE_FALLBACK_CLIENT_JS : NATIVE_FALLBACK_CLIENT_MIN_JS
+    })
 }
 
 export type NativeFallbackRenderScript = {|
@@ -177,7 +185,7 @@ type GetNativeFallbackRenderScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    locationInformation : InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
 async function getLocalNativeFallbackRenderScript() : Promise<?NativeFallbackRenderScript> {
@@ -198,7 +206,7 @@ async function getLocalNativeFallbackRenderScript() : Promise<?NativeFallbackRen
     }
 }
 
-export async function getNativeFallbackRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), locationInformation } : GetNativeFallbackRenderScriptOptions = {}) : Promise<NativeFallbackRenderScript> {
+export async function getNativeFallbackRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), spbVersionManager } : GetNativeFallbackRenderScriptOptions = {}) : Promise<NativeFallbackRenderScript> {
     if (useLocal) {
         const script = await getLocalNativeFallbackRenderScript();
         if (script) {
@@ -206,12 +214,15 @@ export async function getNativeFallbackRenderScript({ logBuffer, cache, debug, u
         }
     }
 
-    const { getTag, getDeployTag, import: watcherImport } = getPayPalSmartPaymentButtonsWatcher({ logBuffer, cache, locationInformation });
-    const { version } = await getTag();
-    const fallback = await watcherImport(debug ? NATIVE_FALLBACK_CLIENT_JS : NATIVE_FALLBACK_CLIENT_MIN_JS, ACTIVE_TAG);
+    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+        flat:         true,
+        dependencies: false,
+        logger:       logBuffer,
+        cache
+    })
 
-    // non-blocking download of the DEPLOY_TAG
-    getDeployTag().catch(noop);
-
-    return { fallback, version };
+    return importParent({
+        moduleDetails,
+        path: debug ? NATIVE_FALLBACK_CLIENT_JS : NATIVE_FALLBACK_CLIENT_MIN_JS
+    })
 }

@@ -6,8 +6,8 @@ export class SDKVersionManager {
     getLiveVersion: () => string
 
     getOrInstallSDK: ({|
-        cdnRegistry:  string,
-        childModules: $ReadOnlyArray<string>,
+        cdnRegistry?:  string,
+        childModules?: $ReadOnlyArray<string>,
         flat:         boolean,
         dependencies: boolean,
         logger:       Object,

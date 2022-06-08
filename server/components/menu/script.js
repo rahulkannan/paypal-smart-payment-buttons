@@ -2,13 +2,12 @@
 
 import { join } from 'path';
 
-import { noop } from '@krakenjs/belter';
+import { getFile } from '@krakenjs/grabthar';
 import { ENV } from '@paypal/sdk-constants';
 
-import type { CacheType, InstanceLocationInformation } from '../../types';
-import { MENU_CLIENT_JS, MENU_CLIENT_MIN_JS, WEBPACK_CONFIG, ACTIVE_TAG, SMART_BUTTONS_MODULE } from '../../config';
+import type { CacheType, SDKVersionManager } from '../../types';
+import { MENU_CLIENT_JS, MENU_CLIENT_MIN_JS, WEBPACK_CONFIG, SMART_BUTTONS_MODULE } from '../../config';
 import { isLocalOrTest, compileWebpack, babelRequire, resolveScript, dynamicRequire, type LoggerBufferType } from '../../lib';
-import { getPayPalSmartPaymentButtonsWatcher } from '../../watchers';
 
 const ROOT = join(__dirname, '../../..');
 
@@ -39,10 +38,10 @@ type GetSmartMenuClientScriptOptions = {|
     logBuffer : ?LoggerBufferType,
     cache : ?CacheType,
     useLocal? : boolean,
-    locationInformation : InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
-export async function getSmartMenuClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), locationInformation } : GetSmartMenuClientScriptOptions = {}) : Promise<SmartMenuClientScript> {
+export async function getSmartMenuClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartMenuClientScriptOptions = {}) : Promise<SmartMenuClientScript> {
     if (useLocal) {
         const script = await compileLocalSmartMenuClientScript();
 
@@ -51,12 +50,15 @@ export async function getSmartMenuClientScript({ logBuffer, cache, debug = false
         }
     }
 
-    const { getTag, getDeployTag, read } = getPayPalSmartPaymentButtonsWatcher({ logBuffer, cache, locationInformation });
-    const { version } = await getTag();
-    const script = await read(debug ? MENU_CLIENT_JS : MENU_CLIENT_MIN_JS, ACTIVE_TAG);
+    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+        flat:         true,
+        dependencies: false,
+        logger:       logBuffer,
+        cache
+    })
 
-    // non-blocking download of the DEPLOY_TAG
-    getDeployTag().catch(noop);
-
-    return { script, version };
+    return getFile({
+        moduleDetails,
+        path: debug ? MENU_CLIENT_JS : MENU_CLIENT_MIN_JS
+    })
 }

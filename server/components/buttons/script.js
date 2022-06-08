@@ -3,16 +3,14 @@
 import { join, dirname } from 'path';
 import { readFileSync } from 'fs';
 
-import { importDependency } from '@krakenjs/grabthar'
-import { noop } from '@krakenjs/belter';
+import { importDependency, getFile } from '@krakenjs/grabthar'
 import { ENV } from '@paypal/sdk-constants';
 
-import type { CacheType, InstanceLocationInformation, SDKVersionManager } from '../../types';
+import type { CacheType,  SDKVersionManager } from '../../types';
 import { BUTTON_RENDER_JS, BUTTON_CLIENT_JS, SMART_BUTTONS_MODULE, CHECKOUT_COMPONENTS_MODULE,
-    BUTTON_CLIENT_MIN_JS, WEBPACK_CONFIG, ACTIVE_TAG } from '../../config';
+    BUTTON_CLIENT_MIN_JS, WEBPACK_CONFIG } from '../../config';
 import { isLocalOrTest, compileWebpack, babelRequire, evalRequireScript, resolveScript,
     dynamicRequire, type LoggerBufferType } from '../../lib';
-import { getPayPalSmartPaymentButtonsWatcher } from '../../watchers';
 
 
 const ROOT = join(__dirname, '../../..');
@@ -102,23 +100,26 @@ type GetSmartPaymentButtonsClientScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    locationInformation : InstanceLocationInformation
+    spbVersionManager : SDKVersionManager
 |};
 
-export async function getSmartPaymentButtonsClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), locationInformation } : GetSmartPaymentButtonsClientScriptOptions = {}) : Promise<SmartPaymentButtonsClientScript> {
+export async function getSmartPaymentButtonsClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartPaymentButtonsClientScriptOptions = {}) : Promise<SmartPaymentButtonsClientScript> {
     if (useLocal) {
         const script = await compileLocalSmartButtonsClientScript();
         if (script) {
             return script;
         }
     }
+    
+    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+        flat:         true,
+        dependencies: false,
+        logger:       logBuffer,
+        cache
+    })
 
-    const { getTag, getDeployTag, read } = getPayPalSmartPaymentButtonsWatcher({ logBuffer, cache, locationInformation });
-    const { version } = await getTag();
-    const script = await read(debug ? BUTTON_CLIENT_JS : BUTTON_CLIENT_MIN_JS, ACTIVE_TAG);
-
-    // non-blocking download of the DEPLOY_TAG
-    getDeployTag().catch(noop);
-
-    return { script, version };
+    return getFile({
+        moduleDetails,
+        path: debug ? BUTTON_CLIENT_JS : BUTTON_CLIENT_MIN_JS
+    })
 }
