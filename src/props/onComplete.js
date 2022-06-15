@@ -36,7 +36,7 @@ const redirect = (url) => {
     return redir(url, window.top);
 };
 
-export function getOnComplete({ createOrder, onComplete, onError } : {| createOrder : CreateOrder, onComplete : ?XOnComplete, onError : OnError |}) : OnComplete {
+export function getOnComplete({ createOrder, onComplete, onError } : {| createOrder : CreateOrder, onComplete : ?XOnComplete, onError : OnError |}) : ?OnComplete {
     if (onComplete) {
         return memoize(() => {
             return createOrder().then(orderID => {
@@ -48,10 +48,12 @@ export function getOnComplete({ createOrder, onComplete, onError } : {| createOr
                         [FPTI_KEY.TOKEN]:        orderID,
                         [FPTI_KEY.CONTEXT_ID]:   orderID
                     }).flush();
-                return onComplete({ orderID }, { redirect }).catch(err => {
-                    return ZalgoPromise.try(() => {
-                        return onError(err);
-                    }).then(() => {
+                return onComplete({ orderID }, { redirect })
+                    .catch(err => {
+                        return ZalgoPromise.try(() => {
+                            return onError(err);
+                        })
+                    .then(() => {
                         throw err;
                     });
                 });
