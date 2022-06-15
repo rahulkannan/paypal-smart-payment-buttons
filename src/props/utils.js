@@ -24,10 +24,10 @@ export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedA
 };
 
 export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : string |} |}) : Breakdown => {
-    const breakdownKeys = Object.keys(breakdown);
     const updatedAmountKeys = Object.keys(updatedAmounts);
 
-    const currency_code = breakdown[breakdownKeys[0]]?.currency_code;
+    // $FlowFixMe
+    const currency_code = Object.values(breakdown)[0]?.currency_code;
 
     updatedAmountKeys.forEach(key => {
         if (!breakdown[key]) {
@@ -44,13 +44,6 @@ export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| brea
 };
 
 export const convertQueriesToArray = ({ queries } : {| queries : {| [$Values<typeof ON_SHIPPING_CHANGE_PATHS>] : Query |} |}) : $ReadOnlyArray<Query> => {
-    const convertedQueries = [];
-    const patchQueryKeys = Object.keys(queries);
-    if (patchQueryKeys) {
-        patchQueryKeys.forEach(key => {
-            convertedQueries.push(queries[key]);
-        });
-    }
-
-    return convertedQueries;
+    // $FlowFixMe
+    return Object.values(queries) || [];
 };

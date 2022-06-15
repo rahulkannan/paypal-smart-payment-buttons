@@ -280,9 +280,9 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 ? (data, actions) => {
                     if (!data.selected_shipping_option) {
                         throw new Error('Must pass selected_shipping_option in data to handle changes in shipping options.');
-                    } else {
-                        return onShippingOptionsChange({ buyerAccessToken, ...data }, actions);
                     }
+                    
+                    return onShippingOptionsChange({ buyerAccessToken, ...data }, actions);
                 } : null,
 
             onClose: () => {
