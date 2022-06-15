@@ -47,7 +47,7 @@ export type CheckoutProps = {|
     getConnectURL? : ?({| payerID : string |}) => ZalgoPromise<string>,
     createOrder : () => ZalgoPromise<string>,
     onApprove : ({| payerID : string, paymentID : ?string, billingToken : ?string, subscriptionID : ?string, authCode : ?string |}) => ZalgoPromise<void> | void,
-    onComplete : () => ZalgoPromise<void> | void,
+    onComplete : ?() => ZalgoPromise<void> | void,
     onAuth : ({| accessToken : string |}) => ZalgoPromise<void> | void,
     onCancel : () => ZalgoPromise<void> | void,
     onShippingChange : ?(data : OnShippingChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,

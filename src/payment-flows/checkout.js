@@ -240,12 +240,13 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .catch(noop);
             },
 
-            onComplete: () => {
-                return onComplete()
-                    // eslint-disable-next-line no-use-before-define
-                    .finally(() => close().then(noop))
-                    .catch(noop);
-            },
+            onComplete: onComplete
+                ? () => {
+                    return onComplete()
+                        // eslint-disable-next-line no-use-before-define
+                        .finally(() => close().then(noop))
+                        .catch(noop);
+                } : null,
 
             onAuth: ({ accessToken }) => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
