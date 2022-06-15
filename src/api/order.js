@@ -303,17 +303,19 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
         return patchData;
     });
 }
-
+type ConfirmPaymentSource = {|
+    [$Values<typeof FUNDING>] : {
+        country_code? : string | null,
+        name? : string | null,
+        email? : string | null,
+        bic? : string | null,
+        bank_id? : string | null,
+        type?: string | 'NONCE',
+        id?: string
+    }
+|}
 export type ConfirmData = {|
-    payment_source : {
-        [$Values<typeof FUNDING>] : {|
-            country_code? : string | null,
-            name? : string | null,
-            email? : string | null,
-            bic? : string | null,
-            bank_id? : string | null
-        |}
-      }
+    payment_source : ConfirmPaymentSource | LimitedNonceSource
 |};
 
 export function confirmOrderAPI(orderID : string, data : ConfirmData, { facilitatorAccessToken, partnerAttributionID } : OrderAPIOptions) : ZalgoPromise<OrderConfirmResponse> {
@@ -359,8 +361,16 @@ export type ValidatePaymentMethodResponse = {|
     |}>
 |};
 
-export function buildPaymentSource(tokenID: string): PaymentSource {
-    const paymentSource : PaymentSource = {
+
+type LimitedNonceSource = {|
+    token : {
+        id : string,
+        type : 'NONCE'
+    },
+|};
+
+export function buildPaymentSource(tokenID: string): LimitedNonceSource {
+    const paymentSource = {
         token: {
             id:   tokenID,
             type: 'NONCE'
