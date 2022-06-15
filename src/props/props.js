@@ -166,7 +166,7 @@ export type Props = {|
     createSubscription : ?XCreateSubscription,
 
     onApprove : OnApprove,
-    onComplete : ?OnComplete,
+    onComplete : OnComplete,
 
     onCancel : OnCancel,
     onShippingChange : ?OnShippingChange,
