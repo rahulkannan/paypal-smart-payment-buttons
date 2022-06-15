@@ -4,7 +4,7 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { memoize, redirect as redir } from '@krakenjs/belter/src';
 import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
-import { getLogger, promiseNoop } from '../lib';
+import { getLogger } from '../lib';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE } from '../constants';
 
 import type { CreateOrder } from './createOrder';
@@ -37,27 +37,25 @@ const redirect = (url) => {
 };
 
 export function getOnComplete({ createOrder, onComplete, onError } : {| createOrder : CreateOrder, onComplete : ?XOnComplete, onError : OnError |}) : OnComplete {
-    if (!onComplete) {
-        return promiseNoop;
-    }
-
-    return memoize(() => {
-        return createOrder().then(orderID => {
-            getLogger()
-                .info('button_complete')
-                .track({
-                    [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.CHECKOUT_COMPLETE,
-                    [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID,
-                    [FPTI_KEY.TOKEN]:        orderID,
-                    [FPTI_KEY.CONTEXT_ID]:   orderID
-                }).flush();
-            return onComplete({ orderID }, { redirect }).catch(err => {
-                return ZalgoPromise.try(() => {
-                    return onError(err);
-                }).then(() => {
-                    throw err;
+    if (onComplete) {
+        return memoize(() => {
+            return createOrder().then(orderID => {
+                getLogger()
+                    .info('button_complete')
+                    .track({
+                        [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.CHECKOUT_COMPLETE,
+                        [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID,
+                        [FPTI_KEY.TOKEN]:        orderID,
+                        [FPTI_KEY.CONTEXT_ID]:   orderID
+                    }).flush();
+                return onComplete({ orderID }, { redirect }).catch(err => {
+                    return ZalgoPromise.try(() => {
+                        return onError(err);
+                    }).then(() => {
+                        throw err;
+                    });
                 });
             });
         });
-    });
+    }
 }
