@@ -17,71 +17,71 @@ import {
 
 describe('onShippingAddressChange', () => {
     const amount = {
-        currency_code: "USD",
-        value: "200.00",
+        currency_code: 'USD',
+        value: '200.00',
         breakdown: {
           item_total: {
-            currency_code: "USD",
-            value: "180.00"
+            currency_code: 'USD',
+            value: '180.00'
           },
           shipping: {
-            currency_code: "USD",
-            value: "5.00"
+            currency_code: 'USD',
+            value: '5.00'
           },
           handling: {
-            currency_code: "USD",
-            value: "1.00"
+            currency_code: 'USD',
+            value: '1.00'
           },
           tax_total: {
-            currency_code: "USD",
-            value: "20.00"
+            currency_code: 'USD',
+            value: '20.00'
           },
           discount: {
-            currency_code: "USD",
-            value: "-10.00"
+            currency_code: 'USD',
+            value: '-10.00'
           }
         }
     };
 
     const shipping_address = {
-        city: "San Jose",
-        state: "CA",
-        country_code: "US",
-        postal_code: "11111"
+        city: 'San Jose',
+        state: 'CA',
+        country_code: 'US',
+        postal_code: '11111'
     };
 
     const tax = '20.00';
-    const discount = '-10.00';
+    const discount = '10.00';
 
     const options = [
         {
-            id: "SHIP_1234",
-            label: "Free Shipping",
-            type: "SHIPPING",
+            id: 'SHIP_1234',
+            label: 'Free Shipping',
+            type: 'SHIPPING',
             selected: true,
             amount: {
-                value: "0.00",
-                currency_code: "USD"
+                value: '0.00',
+                currency_code: 'USD'
             }
         },
         {
-            id: "SHIP_123",
-            label: "Shipping",
-            type: "SHIPPING",
+            id: 'SHIP_123',
+            label: 'Shipping',
+            type: 'SHIPPING',
             selected: false,
             amount: {
-                value: "20.00",
-                currency_code: "USD"
+                value: '20.00',
+                currency_code: 'USD'
             }
         },
         {
-            id: "SHIP_124",
-            label: "Overnight",
-            type: "SHIPPING",
+            id: 'SHIP_124',
+            label: 'Overnight',
+            type: 'SHIPPING',
             selected: false,
             amount: {
-                value: "40.00",
-                currency_code: "USD"
+                value: '40.00',
+                currency_code: 'USD'
             }
         }
     ];
@@ -179,7 +179,7 @@ describe('onShippingAddressChange', () => {
                     .updateShippingOptions({ options })
                     .updateShippingDiscount({ discount })
                     .query();
-                const expectedQuery = `[{"op":"replace","path":"/purchase_units/@reference_id=='default'/amount","value":{"value":"186.00","currency_code":"USD","breakdown":{"item_total":{"currency_code":"USD","value":"180.00"},"shipping":{"currency_code":"USD","value":"5.00"},"handling":{"currency_code":"USD","value":"1.00"},"tax_total":{"currency_code":"USD","value":"20.00"},"discount":{"currency_code":"USD","value":"-10.00"},"shipping_discount":{"currency_code":"USD","value":"-10.00"}}}},{"op":"replace","path":"/purchase_units/@reference_id=='default'/shipping/options","value":[{"id":"SHIP_1234","label":"Free Shipping","type":"SHIPPING","selected":true,"amount":{"value":"0.00","currency_code":"USD"}},{"id":"SHIP_123","label":"Shipping","type":"SHIPPING","selected":false,"amount":{"value":"20.00","currency_code":"USD"}},{"id":"SHIP_124","label":"Overnight","type":"SHIPPING","selected":false,"amount":{"value":"40.00","currency_code":"USD"}}]}]`;
+                const expectedQuery = `[{"op":"replace","path":"/purchase_units/@reference_id=='default'/amount","value":{"value":"181.00","currency_code":"USD","breakdown":{"item_total":{"currency_code":"USD","value":"180.00"},"shipping":{"currency_code":"USD","value":"0.00"},"handling":{"currency_code":"USD","value":"1.00"},"tax_total":{"currency_code":"USD","value":"20.00"},"discount":{"currency_code":"USD","value":"-10.00"},"shipping_discount":{"currency_code":"USD","value":"10.00"}}}},{"op":"replace","path":"/purchase_units/@reference_id=='default'/shipping/options","value":[{"id":"SHIP_1234","label":"Free Shipping","type":"SHIPPING","selected":true,"amount":{"value":"0.00","currency_code":"USD"}},{"id":"SHIP_123","label":"Shipping","type":"SHIPPING","selected":false,"amount":{"value":"20.00","currency_code":"USD"}},{"id":"SHIP_124","label":"Overnight","type":"SHIPPING","selected":false,"amount":{"value":"40.00","currency_code":"USD"}}]}]`;
 
                 if (query !== expectedQuery) {
                     throw new Error(`Expected query, ${ query }, to be, ${ expectedQuery }`);
@@ -248,7 +248,7 @@ describe('onShippingAddressChange', () => {
                     .updateShippingOptions({ options })
                     .updateTax({ tax })    
                     .query();
-                const expectedQuery = `[{"op":"replace","path":"/purchase_units/@reference_id=='default'/amount","value":{"value":"186.00","currency_code":"USD","breakdown":{"item_total":{"currency_code":"USD","value":"180.00"},"shipping":{"currency_code":"USD","value":"5.00"},"handling":{"currency_code":"USD","value":"1.00"},"tax_total":{"currency_code":"USD","value":"20.00"},"discount":{"currency_code":"USD","value":"-10.00"},"shipping_discount":{"currency_code":"USD","value":"-10.00"}}}},{"op":"replace","path":"/purchase_units/@reference_id=='default'/shipping/options","value":[{"id":"SHIP_1234","label":"Free Shipping","type":"SHIPPING","selected":true,"amount":{"value":"0.00","currency_code":"USD"}},{"id":"SHIP_123","label":"Shipping","type":"SHIPPING","selected":false,"amount":{"value":"20.00","currency_code":"USD"}},{"id":"SHIP_124","label":"Overnight","type":"SHIPPING","selected":false,"amount":{"value":"40.00","currency_code":"USD"}}]}]`;
+                const expectedQuery = `[{"op":"replace","path":"/purchase_units/@reference_id=='default'/amount","value":{"value":"181.00","currency_code":"USD","breakdown":{"item_total":{"currency_code":"USD","value":"180.00"},"shipping":{"currency_code":"USD","value":"0.00"},"handling":{"currency_code":"USD","value":"1.00"},"tax_total":{"currency_code":"USD","value":"20.00"},"discount":{"currency_code":"USD","value":"-10.00"},"shipping_discount":{"currency_code":"USD","value":"10.00"}}}},{"op":"replace","path":"/purchase_units/@reference_id=='default'/shipping/options","value":[{"id":"SHIP_1234","label":"Free Shipping","type":"SHIPPING","selected":true,"amount":{"value":"0.00","currency_code":"USD"}},{"id":"SHIP_123","label":"Shipping","type":"SHIPPING","selected":false,"amount":{"value":"20.00","currency_code":"USD"}},{"id":"SHIP_124","label":"Overnight","type":"SHIPPING","selected":false,"amount":{"value":"40.00","currency_code":"USD"}}]}]`;
 
                 if (query !== expectedQuery) {
                     throw new Error(`Expected query, ${ query }, to be, ${ expectedQuery }`);
@@ -405,7 +405,7 @@ describe('onShippingAddressChange', () => {
                                 amount,
                                 shipping_address
                             }, { reject: expect('reject', (error) => {
-                                const expectedError = "Your order can't be shipped to this address.";
+                                const expectedError = `Your order can't be shipped to this address.`;
 
                                 if (error !== expectedError) {
                                     throw new Error(`Expected error message to be, ${ expectedError }, but was ${ error }`);

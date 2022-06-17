@@ -21,7 +21,7 @@ export type XOnShippingAddressChangeDataType = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    shipping_address? : {|
+    shippingAddress? : {|
         city : string,
         state : string,
         country_code : $Values<typeof COUNTRY>,
@@ -64,9 +64,13 @@ export type OnShippingAddressChangeActionsType = {|
             
 export function buildXOnShippingAddressChangeData(data : OnShippingAddressChangeData) : XOnShippingAddressChangeDataType {
     // eslint-disable-next-line no-unused-vars
-    const { amount, buyerAccessToken, event, forceRestAPI, ...rest } = data;
+    const { amount, buyerAccessToken, event, forceRestAPI, shipping_address: shippingAddress, ...rest } = data;
 
-    return { ...rest, errors: SHIPPING_ADDRESS_ERROR_MESSAGES };
+    return {
+        errors: SHIPPING_ADDRESS_ERROR_MESSAGES,
+        shippingAddress,
+        ...rest,
+    };
 }
 
 export function buildXOnShippingAddressChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingAddressChangeData, actions : OnShippingAddressChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingAddressChangeActionsType {
@@ -102,11 +106,29 @@ export function buildXOnShippingAddressChangeActions({ data, actions: passedActi
         },
 
         updateShippingOptions: ({ options }) => {
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
-                op:    data?.event || 'replace', // or 'add' if there are none.
-                path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                value: options || []
-            };
+            if (options && options.length > 0) {
+                const selectedShippingOption = options.filter(option => option.selected === true);
+                const selectedShippingOptionAmount = selectedShippingOption && selectedShippingOption[0]?.amount?.value;
+
+                breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
+                newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
+            
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
+                    op:       'replace',
+                    path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
+                    value: {
+                        value:         `${ newAmount }`,
+                        currency_code: data?.amount?.currency_code,
+                        breakdown
+                    }
+                };
+
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
+                    op:    data?.event || 'replace', // or 'add' if there are none.
+                    path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
+                    value: options
+                };
+            }
 
             return actions;
         },

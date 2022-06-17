@@ -1,29 +1,47 @@
 /* @flow */
 
-import { type Breakdown, type Query, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
+import { type Breakdown, type Query, type ShippingOption, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
 
-export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedAmounts } : {| breakdown : Breakdown, updatedAmounts : {| [string] : string |} |}) : string => {
+export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedAmounts } : {| breakdown : Breakdown, updatedAmounts : {| [string] : ?string |} |}) : string => {
     let newAmount = 0;
     const updatedAmountKeys = Object.keys(updatedAmounts) || [];
 
     Object.keys(breakdown).forEach(item => {
+        const shippingDiscountKey = item === 'shipping_discount';
+
         if (updatedAmountKeys.indexOf(item) !== -1) {
-            newAmount += parseFloat(updatedAmounts[item]);
+            if (shippingDiscountKey) {
+                newAmount -= Math.abs(parseFloat(updatedAmounts[item]));
+            } else {
+                newAmount += parseFloat(updatedAmounts[item]);
+            }
         } else {
-            newAmount += parseFloat(breakdown[item]?.value);
+            if (shippingDiscountKey) {
+                newAmount -= Math.abs(parseFloat(breakdown[item]?.value));
+            } else {
+                newAmount += parseFloat(breakdown[item]?.value);
+            }
         }
     });
 
     updatedAmountKeys.forEach(key => {
+        const shippingDiscountKey = key === 'shipping_discount';
+
         if (!breakdown[key]) {
-            newAmount += parseFloat(updatedAmounts[key]);
+            if (updatedAmounts[key]) {
+                if (shippingDiscountKey) {
+                    newAmount -= Math.abs(parseFloat(updatedAmounts[key]));
+                } else {
+                    newAmount += parseFloat(updatedAmounts[key]);
+                }
+            }
         }
     });
 
     return newAmount.toFixed(2);
 };
 
-export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : string |} |}) : Breakdown => {
+export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : ?string |} |}) : Breakdown => {
     const updatedAmountKeys = Object.keys(updatedAmounts);
 
     // $FlowFixMe
@@ -31,10 +49,12 @@ export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| brea
 
     updatedAmountKeys.forEach(key => {
         if (!breakdown[key]) {
-            breakdown[key] = {
-                currency_code,
-                value: updatedAmounts[key]
-            };
+            if (updatedAmounts[key]) {
+                breakdown[key] = {
+                    currency_code,
+                    value: key === 'shipping_discount' ? parseFloat(Math.abs(updatedAmounts[key])).toFixed(2) : updatedAmounts[key]
+                };
+            }
         } else {
             breakdown[key].value = updatedAmounts[key];
         }
@@ -46,4 +66,24 @@ export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| brea
 export const convertQueriesToArray = ({ queries } : {| queries : {| [$Values<typeof ON_SHIPPING_CHANGE_PATHS>] : Query |} |}) : $ReadOnlyArray<Query> => {
     // $FlowFixMe
     return Object.values(queries) || [];
+};
+
+export const updateShippingOptions = ({ option, options } : {| option: ShippingOption, options : $ReadOnlyArray<ShippingOption>|}) : $ReadOnlyArray<ShippingOption> => {
+    const updatedOptions = [];
+
+    options.forEach(opt => {
+        if (!opt.id) {
+            throw new Error(`Must provide an id with each shipping option.`);
+        }
+        
+        if (opt.id === option.id) {
+            opt.selected = true;
+            updatedOptions.push(opt);
+        } else {
+            opt.selected = false;
+            updatedOptions.push(opt);
+        }
+    });
+
+    return updatedOptions;
 };

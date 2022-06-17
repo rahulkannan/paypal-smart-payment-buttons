@@ -15,13 +15,13 @@ import {
     ON_SHIPPING_CHANGE_PATHS,
     SHIPPING_OPTIONS_ERROR_MESSAGES
 } from './onShippingChange';
-import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from './utils';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateShippingOptions } from './utils';
        
 export type XOnShippingOptionsChangeDataType = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    selected_shipping_option? : ShippingOption,
+    selectedShippingOption? : ShippingOption,
     errors : typeof SHIPPING_OPTIONS_ERROR_MESSAGES
 |};
 
@@ -30,7 +30,7 @@ export type XOnShippingOptionsChangeActionsType = {|
     query : () => string,
     reject : (string) => ZalgoPromise<void>,
     updateShippingDiscount : ({| discount : string |}) => XOnShippingOptionsChangeActionsType,
-    updateShippingOptions : ({| options : $ReadOnlyArray<ShippingOption> |}) => XOnShippingOptionsChangeActionsType
+    updateShippingOption : ({| option : ShippingOption |}) => XOnShippingOptionsChangeActionsType
 |};
 
 export type XOnShippingOptionsChange = (XOnShippingOptionsChangeDataType, XOnShippingOptionsChangeActionsType) => ZalgoPromise<void>;
@@ -40,6 +40,7 @@ export type OnShippingOptionsChangeData = {|
     paymentID? : string,
     paymentToken? : string,
     selected_shipping_option? : ShippingOption,
+    options? : $ReadOnlyArray<ShippingOption>,
     amount? : ShippingAmount,
     event? : ON_SHIPPING_CHANGE_EVENT,
     buyerAccessToken? : ?string,
@@ -53,9 +54,13 @@ export type OnShippingOptionsChangeActionsType = {|
             
 export function buildXOnShippingOptionsChangeData(data : OnShippingOptionsChangeData) : XOnShippingOptionsChangeDataType {
     // eslint-disable-next-line no-unused-vars
-    const { amount, buyerAccessToken, event, forceRestAPI, ...rest } = data;
+    const { amount, buyerAccessToken, event, forceRestAPI, options, selected_shipping_option: selectedShippingOption, ...rest } = data;
 
-    return { ...rest, errors: SHIPPING_OPTIONS_ERROR_MESSAGES };
+    return {
+        errors: SHIPPING_OPTIONS_ERROR_MESSAGES,
+        selectedShippingOption,
+        ...rest
+    };
 }
 
 export function buildXOnShippingOptionsChangeActions({ data, actions: passedActions, orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : {| data : OnShippingOptionsChangeData, actions : OnShippingOptionsChangeActionsType, orderID : string, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean |}) : XOnShippingOptionsChangeActionsType {
@@ -73,12 +78,33 @@ export function buildXOnShippingOptionsChangeActions({ data, actions: passedActi
             throw new Error(`Missing reject action callback`);
         },
 
-        updateShippingOptions: ({ options }) => {
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
-                op:    data?.event || 'replace', // or 'add' if there are none.
-                path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                value: options || []
-            };
+        updateShippingOption: ({ option }) => {
+            if (option && data.options) {
+                const selectedShippingOptionAmount = option?.amount?.value;
+                const options = updateShippingOptions({ option, options: data.options });
+
+                newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { shipping: selectedShippingOptionAmount } });
+                breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
+
+                if (options && options.length > 0) {
+                    patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
+                        op:    data?.event || 'replace', // or 'add' if there are none.
+                        path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
+                        value: options
+                    };
+                }
+
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
+                    op:       'replace',
+                    path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
+                    value: {
+                        value:         `${ newAmount }`,
+                        currency_code: data?.amount?.currency_code,
+                        breakdown
+                    }
+                };
+            }
+
             return actions;
         },
 

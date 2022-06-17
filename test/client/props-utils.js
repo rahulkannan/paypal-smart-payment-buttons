@@ -1,6 +1,6 @@
 /* @flow */
 
-import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray } from '../../src/props/utils';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateShippingOptions } from '../../src/props/utils';
 import { ON_SHIPPING_CHANGE_PATHS } from '../../src/props/onShippingChange';
 
 describe('onShippingChange utils', () => {
@@ -50,9 +50,74 @@ describe('onShippingChange utils', () => {
                 throw new Error(`Expected result to be 115.0, but got ${ result }`);
             }
         });
+
+        it('should calculate correct amount when shipping_discount is updated with a positive number', () => {
+            const breakdown = {
+                item_total: {
+                    value: '100.0',
+                    currency_code: 'USD'
+                },
+                shipping: {
+                    value: '10.0',
+                    currency_code: 'USD'
+                }
+            };
+            const updatedAmounts = {
+                shipping_discount: '5.0'
+            };
+
+            const result = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts });
+            if (result !== '105.00') {
+                throw new Error(`Expected result to be 105.00, but got ${ result }`);
+            }
+        });
+
+        it('should calculate correct amount when shipping_discount is updated with a negative number', () => {
+            const breakdown = {
+                item_total: {
+                    value: '100.0',
+                    currency_code: 'USD'
+                },
+                shipping: {
+                    value: '10.0',
+                    currency_code: 'USD'
+                }
+            };
+            const updatedAmounts = {
+                shipping_discount: '-5.0'
+            };
+
+            const result = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts });
+            if (result !== '105.00') {
+                throw new Error(`Expected result to be 105.00, but got ${ result }`);
+            }
+        });
     });
 
     describe('buildBreakdown', () => {
+        it('should build breakdown for shipping_discount to be positive if sent as negative', () => {
+            const breakdown = {
+                item_total: {
+                    value: '100.0',
+                    currency_code: 'USD'
+                },
+                shipping: {
+                    value: '10.0',
+                    currency_code: 'USD'
+                }
+            };
+            const updatedAmounts = {
+                shipping_discount: '-5.0'
+            };
+
+            const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"shipping_discount":{"currency_code":"USD","value":"5.00"}});
+            const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
+
+            if (result !== expectedResult) {
+                throw new Error(`Expected result, ${ expectedResult } to match result, ${ result }`);
+            }
+        });
+
         it('should build the breakdown request for shipping change patch call with updated amounts present in breakdown', () => {
             const breakdown = {
                 item_total: {
@@ -232,6 +297,60 @@ describe('onShippingChange utils', () => {
             if (result !== expectedResult) {
                 throw new Error(`Expected result to match result. ${ JSON.stringify(result) }`);
             }
+        });
+    });
+
+    describe('updateOptions', () => {
+        const shippingOptions = [
+            {
+                id: "SHIP_1234",
+                label: "Free Shipping",
+                type: "SHIPPING",
+                selected: true,
+                amount: {
+                    value: "0.00",
+                    currency_code: "USD"
+                }
+            },
+            {
+                id: "SHIP_123",
+                label: "Shipping",
+                type: "SHIPPING",
+                selected: false,
+                amount: {
+                    value: "20.00",
+                    currency_code: "USD"
+                }
+            },
+            {
+                id: "SHIP_124",
+                label: "Overnight",
+                type: "SHIPPING",
+                selected: false,
+                amount: {
+                    value: "40.00",
+                    currency_code: "USD"
+                }
+            }
+        ];
+
+        it('should update options with selected option', () => {
+            const selectedShippingOption = {
+                id: "SHIP_123",
+                label: "Shipping",
+                type: "SHIPPING",
+                amount: {
+                    value: "20.00",
+                    currency_code: "USD"
+                }
+            };
+
+            const result = updateShippingOptions({ option: selectedShippingOption, options: shippingOptions });
+            result.forEach(option => {
+                if (option.selected && option.label !== 'Shipping') {
+                    throw new Error(`Expected selected option to be SHIP_123.`);
+                }
+            })
         });
     });
 });
