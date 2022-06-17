@@ -5,18 +5,17 @@ import { type Breakdown, type Query, type ShippingOption, ON_SHIPPING_CHANGE_PAT
 export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedAmounts } : {| breakdown : Breakdown, updatedAmounts : {| [string] : ?string |} |}) : string => {
     let newAmount = 0;
     const updatedAmountKeys = Object.keys(updatedAmounts) || [];
+    const discountKeys = [ 'shipping_discount', 'discount' ];
 
     Object.keys(breakdown).forEach(item => {
-        const shippingDiscountKey = item === 'shipping_discount';
-
         if (updatedAmountKeys.indexOf(item) !== -1) {
-            if (shippingDiscountKey) {
+            if (discountKeys.includes(item)) {
                 newAmount -= Math.abs(parseFloat(updatedAmounts[item]));
             } else {
                 newAmount += parseFloat(updatedAmounts[item]);
             }
         } else {
-            if (shippingDiscountKey) {
+            if (discountKeys.includes(item)) {
                 newAmount -= Math.abs(parseFloat(breakdown[item]?.value));
             } else {
                 newAmount += parseFloat(breakdown[item]?.value);
@@ -25,11 +24,9 @@ export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedA
     });
 
     updatedAmountKeys.forEach(key => {
-        const shippingDiscountKey = key === 'shipping_discount';
-
         if (!breakdown[key]) {
             if (updatedAmounts[key]) {
-                if (shippingDiscountKey) {
+                if (discountKeys.includes(key)) {
                     newAmount -= Math.abs(parseFloat(updatedAmounts[key]));
                 } else {
                     newAmount += parseFloat(updatedAmounts[key]);
@@ -42,6 +39,7 @@ export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedA
 };
 
 export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : ?string |} |}) : Breakdown => {
+    const discountKeys = [ 'shipping_discount', 'discount' ];
     const updatedAmountKeys = Object.keys(updatedAmounts);
 
     // $FlowFixMe
@@ -52,7 +50,7 @@ export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| brea
             if (updatedAmounts[key]) {
                 breakdown[key] = {
                     currency_code,
-                    value: key === 'shipping_discount' ? parseFloat(Math.abs(updatedAmounts[key])).toFixed(2) : updatedAmounts[key]
+                    value: updatedAmounts[key] && discountKeys.includes(key) ? Math.abs(parseFloat(updatedAmounts[key])).toFixed(2) : updatedAmounts[key]
                 };
             }
         } else {
@@ -75,7 +73,7 @@ export const updateShippingOptions = ({ option, options } : {| option: ShippingO
         if (!opt.id) {
             throw new Error(`Must provide an id with each shipping option.`);
         }
-        
+
         if (opt.id === option.id) {
             opt.selected = true;
             updatedOptions.push(opt);

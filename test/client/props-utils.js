@@ -92,6 +92,48 @@ describe('onShippingChange utils', () => {
                 throw new Error(`Expected result to be 105.00, but got ${ result }`);
             }
         });
+
+        it('should calculate correct amount when discount is updated with a positive number', () => {
+            const breakdown = {
+                item_total: {
+                    value: '100.0',
+                    currency_code: 'USD'
+                },
+                shipping: {
+                    value: '10.0',
+                    currency_code: 'USD'
+                }
+            };
+            const updatedAmounts = {
+                discount: '5.0'
+            };
+
+            const result = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts });
+            if (result !== '105.00') {
+                throw new Error(`Expected result to be 105.00, but got ${ result }`);
+            }
+        });
+
+        it('should calculate correct amount when shipping_discount is updated with a negative number', () => {
+            const breakdown = {
+                item_total: {
+                    value: '100.0',
+                    currency_code: 'USD'
+                },
+                shipping: {
+                    value: '10.0',
+                    currency_code: 'USD'
+                }
+            };
+            const updatedAmounts = {
+                discount: '-5.0'
+            };
+
+            const result = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts });
+            if (result !== '105.00') {
+                throw new Error(`Expected result to be 105.00, but got ${ result }`);
+            }
+        });
     });
 
     describe('buildBreakdown', () => {
@@ -111,6 +153,29 @@ describe('onShippingChange utils', () => {
             };
 
             const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"shipping_discount":{"currency_code":"USD","value":"5.00"}});
+            const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
+
+            if (result !== expectedResult) {
+                throw new Error(`Expected result, ${ expectedResult } to match result, ${ result }`);
+            }
+        });
+
+        it('should build breakdown for discount to be positive if sent as negative', () => {
+            const breakdown = {
+                item_total: {
+                    value: '100.0',
+                    currency_code: 'USD'
+                },
+                shipping: {
+                    value: '10.0',
+                    currency_code: 'USD'
+                }
+            };
+            const updatedAmounts = {
+                discount: '-5.0'
+            };
+
+            const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"discount":{"currency_code":"USD","value":"5.00"}});
             const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
 
             if (result !== expectedResult) {
@@ -339,6 +404,7 @@ describe('onShippingChange utils', () => {
                 id: "SHIP_123",
                 label: "Shipping",
                 type: "SHIPPING",
+                selected: true,
                 amount: {
                     value: "20.00",
                     currency_code: "USD"
