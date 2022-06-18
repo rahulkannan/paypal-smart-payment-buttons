@@ -24,12 +24,14 @@ function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolea
 
     if (experience === EXPERIENCE.INLINE && !isCrossSiteTrackingEnabled('enforce_policy')) {
         const inlinexoExperiment = createExperiment('inlinexo', 50);
+        
+        inlinexoExperiment.logStart({
+            [FPTI_KEY.CONTEXT_TYPE]:       FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID,
+            [FPTI_KEY.CONTEXT_ID]:         buttonSessionID,
+            [FPTI_KEY.BUTTON_SESSION_UID]: buttonSessionID,
+        });
+
         if (inlinexoExperiment.isEnabled()) {
-            inlinexoExperiment.logStart({
-                [FPTI_KEY.CONTEXT_TYPE]:       FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID,
-                [FPTI_KEY.CONTEXT_ID]:         buttonSessionID,
-                [FPTI_KEY.BUTTON_SESSION_UID]: buttonSessionID,
-            });
             return false;
         }
     }
