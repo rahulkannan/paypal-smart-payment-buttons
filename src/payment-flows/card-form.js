@@ -6,7 +6,7 @@ import { createExperiment } from '@paypal/sdk-client/src';
 import { memoize, querySelectorAll, debounce, noop, isCrossSiteTrackingEnabled } from '@krakenjs/belter/src';
 import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 
-import { DATA_ATTRIBUTES, FPTI_CONTEXT_TYPE } from '../constants';
+import { AMPLITUDE_KEY, DATA_ATTRIBUTES, FPTI_CONTEXT_TYPE } from '../constants';
 import { unresolvedPromise, promiseNoop } from '../lib';
 
 import type { PaymentFlow, PaymentFlowInstance, IsEligibleOptions, IsPaymentEligibleOptions, InitOptions } from './types';
@@ -24,11 +24,12 @@ function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolea
 
     if (experience === EXPERIENCE.INLINE && !isCrossSiteTrackingEnabled('enforce_policy')) {
         const inlinexoExperiment = createExperiment('inlinexo', 50);
-        
+
         inlinexoExperiment.logStart({
             [FPTI_KEY.CONTEXT_TYPE]:       FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID,
             [FPTI_KEY.CONTEXT_ID]:         buttonSessionID,
             [FPTI_KEY.BUTTON_SESSION_UID]: buttonSessionID,
+            [AMPLITUDE_KEY.USER_ID]:       buttonSessionID,
         });
 
         if (inlinexoExperiment.isEnabled()) {
