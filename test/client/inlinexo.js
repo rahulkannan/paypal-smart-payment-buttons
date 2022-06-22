@@ -12,7 +12,10 @@ import {
     createButtonHTML,
     mockFunction,
     clickButton,
-    getRestfulCaptureOrderApiMock, getGraphQLApiMock } from './mocks';
+    getRestfulCaptureOrderApiMock,
+    getRestfulGetOrderApiMock,
+    getGraphQLApiMock
+} from './mocks';
 
 describe('Inline XO cases', () => {
     
@@ -253,7 +256,7 @@ describe('Inline XO cases', () => {
                     throw new Error(`Expected actions.redirect() to be available.`);
                 }
 
-                const getOrderMock = getRestfulCaptureOrderApiMock({
+                const getOrderMock = getRestfulGetOrderApiMock({
                     handler: expect('getOrder', ({ headers }) => {
                         if (headers.authorization !== `Bearer ${ facilitatorAccessToken }`) {
                             throw new Error(`Expected call to come with correct facilitator access token`);
