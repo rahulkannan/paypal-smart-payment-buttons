@@ -177,7 +177,9 @@ describe('Inline XO cases', () => {
                     })
                 });
                 captureOrderMock.expectCalls();
-                await actions.capture();
+                if (data.intent === 'authorize') {
+                    await actions.capture();
+                }
                 captureOrderMock.done();
             });
 
