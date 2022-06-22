@@ -5,8 +5,10 @@ import { undotify } from '@krakenjs/belter';
 import { ERROR_CODE } from '@paypal/sdk-constants';
 
 import type {
-    ExpressRequest, ExpressResponse, LoggerType,
-    CacheType, InstanceLocationInformation, SDKMeta
+    ExpressRequest,
+    ExpressResponse,
+    LoggerType,
+    SDKMeta
 } from '../types';
 import { EVENT, BROWSER_CACHE_TIME, HTTP_HEADER } from '../config';
 

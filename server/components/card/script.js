@@ -35,7 +35,7 @@ type GetSmartCardClientScriptOptions = {|
     spbVersionManager : SDKVersionManager
 |};
 
-export async function getSmartCardClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartCardClientScriptOptions = {}) : Promise<SmartCardClientScript> {
+export async function getSmartCardClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartCardClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileLocalSmartCardClientScript();
 

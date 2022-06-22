@@ -897,7 +897,7 @@ getRestfulCaptureOrderApiMock().listen();
 getRestfulAuthorizeOrderApiMock().listen();
 getRestfulPatchOrderApiMock().listen();
 
-
+// eslint-disable-next-line compat/compat
 navigator.sendBeacon = () => true;
 
 type NativeMockWebSocket = {|

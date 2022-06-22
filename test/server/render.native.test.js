@@ -2,17 +2,14 @@
 
 import { noop } from '@krakenjs/belter';
 import { FUNDING } from '@paypal/sdk-constants';
+import { getVersionFromNodeModules } from '@krakenjs/grabthar'
 
-import { getNativePopupMiddleware, getNativeFallbackMiddleware, cancelWatchers } from '../../server';
+import { getNativePopupMiddleware, getNativeFallbackMiddleware } from '../../server';
+import { type SDKVersionManager } from '../../server/types'
 
-import { mockReq, mockRes, graphQL, tracking, getInstanceLocationInformation } from './mock';
+import { mockReq, mockRes, graphQL, tracking } from './mock';
 
 jest.setTimeout(300000);
-
-afterAll((done) => {
-    cancelWatchers();
-    done();
-});
 
 const cache = {
     // eslint-disable-next-line no-unused-vars
@@ -28,8 +25,14 @@ const logger = {
     track: noop
 };
 
+// $FlowFixMe testing impl
+const spbVersionManager: SDKVersionManager = {
+    getLiveVersion: () => '5.0.100',
+    getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
+}
+
 test('should do a basic native popup render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, getInstanceLocationInformation });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, spbVersionManager });
 
     const req = mockReq({
         query: {
@@ -59,7 +62,7 @@ test('should do a basic native popup render and succeed', async () => {
 });
 
 test('should do a basic native popup render and fail with a non-paypal domain', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, getInstanceLocationInformation });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, spbVersionManager });
 
     const req = mockReq({
         query: {
@@ -89,7 +92,7 @@ test('should do a basic native popup render and fail with a non-paypal domain', 
 });
 
 test('should do a basic venmo popup render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, getInstanceLocationInformation });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, spbVersionManager });
 
     const req = mockReq({
         query: {
@@ -119,7 +122,7 @@ test('should do a basic venmo popup render and succeed', async () => {
 });
 
 test('should do a basic venmo popup render and fail with a non-paypal domain', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, getInstanceLocationInformation });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, spbVersionManager });
 
     const req = mockReq({
         query: {
@@ -149,7 +152,7 @@ test('should do a basic venmo popup render and fail with a non-paypal domain', a
 });
 
 test('should do a basic native fallback render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, getInstanceLocationInformation });
+    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, spbVersionManager });
 
     const req = mockReq({
         query: {
@@ -179,7 +182,7 @@ test('should do a basic native fallback render and succeed', async () => {
 });
 
 test('should do a basic venmo fallback render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, getInstanceLocationInformation });
+    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, spbVersionManager });
 
     const req = mockReq({
         query: {

@@ -4,7 +4,7 @@ import { join, dirname } from 'path';
 import { readFileSync } from 'fs';
 
 import { getFile, importParent } from '@krakenjs/grabthar';
-import { ENV, FUNDING } from '@paypal/sdk-constants';
+import { FUNDING } from '@paypal/sdk-constants';
 
 import type { CacheType, SDKVersionManager } from '../../types';
 import { NATIVE_POPUP_CLIENT_JS, NATIVE_POPUP_CLIENT_MIN_JS, NATIVE_FALLBACK_CLIENT_JS,

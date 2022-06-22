@@ -230,13 +230,6 @@ const getMerchantID = () => {
 
 const getPersonalizationEnabled = () => true;
 
-const getInstanceLocationInformation = () => {
-    return {
-        cdnHostName:  'string',
-        paypalDomain: 'string'
-    };
-};
-
 const getSDKLocationInformation = () => Promise.resolve({
     sdkCDNRegistry: 'string',
     sdkActiveTag:   'string'
@@ -280,16 +273,18 @@ const buttonMiddleware = getButtonMiddleware({
     content,
     tracking,
     getPersonalizationEnabled,
-    getInstanceLocationInformation,
     getSDKLocationInformation,
     // $FlowFixMe we don't use this locally
     sdkVersionManager: {},
+    // $FlowFixMe we don't use this locally
+    spbVersionManager: {},
 });
 
 const menuMiddleware = getMenuMiddleware({
     cache,
     logger,
-    getInstanceLocationInformation
+    // $FlowFixMe we don't use this locally
+    spbVersionManager: {},
 });
 
 const nativePopupMiddleware = getNativePopupMiddleware({
@@ -298,7 +293,8 @@ const nativePopupMiddleware = getNativePopupMiddleware({
     graphQL,
     tracking,
     fundingSource: FUNDING.PAYPAL,
-    getInstanceLocationInformation
+    // $FlowFixMe we don't use this locally
+    spbVersionManager: {},
 });
 
 const nativeFallbackMiddleware = getNativeFallbackMiddleware({
@@ -307,13 +303,15 @@ const nativeFallbackMiddleware = getNativeFallbackMiddleware({
     graphQL,
     tracking,
     fundingSource: FUNDING.PAYPAL,
-    getInstanceLocationInformation
+    // $FlowFixMe we don't use this locally
+    spbVersionManager: {},
 });
 
 const qrCodeMiddleware = getQRCodeMiddleware({
     cache,
     logger,
-    getInstanceLocationInformation
+    // $FlowFixMe we don't use this locally
+    spbVersionManager: {},
 });
 
 const venmoPopupMiddleware = getNativePopupMiddleware({
@@ -322,7 +320,8 @@ const venmoPopupMiddleware = getNativePopupMiddleware({
     graphQL,
     tracking,
     fundingSource: FUNDING.VENMO,
-    getInstanceLocationInformation
+    // $FlowFixMe we don't use this locally
+    spbVersionManager: {},
 });
 
 const venmoFallbackMiddleware = getNativeFallbackMiddleware({
@@ -331,7 +330,8 @@ const venmoFallbackMiddleware = getNativeFallbackMiddleware({
     graphQL,
     tracking,
     fundingSource: FUNDING.VENMO,
-    getInstanceLocationInformation
+    // $FlowFixMe we don't use this locally
+    spbVersionManager: {},
 });
 
 const buttonsScriptMiddleware = webpackDevMiddleware(webpack(WEBPACK_CONFIG_BUTTONS_LOCAL_DEBUG), { serverSideRender: true });

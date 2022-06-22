@@ -1,6 +1,9 @@
 /* @flow */
 
 import { noop } from '@krakenjs/belter';
+import { getVersionFromNodeModules } from '@krakenjs/grabthar'
+
+import { type SDKVersionManager } from "../../types"
 
 import { compileLocalSmartQRCodeClientScript, getSmartQRCodeClientScript } from './script';
 
@@ -21,6 +24,12 @@ const logBuffer = {
     error: noop
 };
 
+// $FlowFixMe testing impl
+const spbVersionManager: SDKVersionManager = {
+    getLiveVersion: () => '5.0.100',
+    getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
+}
+
 test('compileLocalSmartQRCodeClientScript', async () => {
     const script = await compileLocalSmartQRCodeClientScript();
 
@@ -39,11 +48,8 @@ test('getSmartQRCodeClientScript - base', async () => {
 
 test('getSmartQRCodeClientScript - debug', async () => {
     const debug = true;
-    const locationInformation = {
-        cdnHostName:  '',
-        paypalDomain: ''
-    };
-    const script = await getSmartQRCodeClientScript({ logBuffer, cache, debug, locationInformation });
+
+    const script = await getSmartQRCodeClientScript({ logBuffer, cache, debug, spbVersionManager });
 
     if (!script) {
         throw new Error(`Expected a script from compileLocalSmartQRCodeClientScript`);

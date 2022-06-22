@@ -1,10 +1,13 @@
 /* @flow */
 
 import { noop } from '@krakenjs/belter';
+import { getVersionFromNodeModules } from '@krakenjs/grabthar'
 
-import { getCardMiddleware, cancelWatchers } from '../../server';
+import { getCardMiddleware } from '../../server';
+import { type SDKVersionManager } from '../../server/types'
 
-import { mockReq, mockRes, getAccessToken, getInstanceLocationInformation } from './mock';
+import { mockReq, mockRes, getAccessToken } from './mock';
+
 
 function getSetupCardParams(template) : Object {
     const setupCardParamsString = template && template.match(/<script nonce="">smartCard.setupCard\((.*?)\)<\/script>/);
@@ -12,11 +15,6 @@ function getSetupCardParams(template) : Object {
 }
 
 jest.setTimeout(300000);
-
-afterAll((done) => {
-    cancelWatchers();
-    done();
-});
 
 const cache = {
     // eslint-disable-next-line no-unused-vars
@@ -32,8 +30,15 @@ const logger = {
     track: noop
 };
 
+
+// $FlowFixMe testing impl
+const spbVersionManager: SDKVersionManager = {
+    getLiveVersion: () => '5.0.100',
+    getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
+}
+
 test('should do a basic card render and succeed', async () => {
-    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, getInstanceLocationInformation });
+    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, spbVersionManager });
 
     const req = mockReq({
         query: {
@@ -69,7 +74,7 @@ test('should do a basic card render and succeed', async () => {
 });
 
 test('should fail with a non-clientId', async () => {
-    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, getInstanceLocationInformation });
+    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, spbVersionManager });
 
     const req = mockReq({
         query: {
