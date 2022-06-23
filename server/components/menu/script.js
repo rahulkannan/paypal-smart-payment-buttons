@@ -32,10 +32,10 @@ type GetSmartMenuClientScriptOptions = {|
     logBuffer : ?LoggerBufferType,
     cache : ?CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
-export async function getSmartMenuClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartMenuClientScriptOptions = {}) : Promise<string> {
+export async function getSmartMenuClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), buttonsVersionManager } : GetSmartMenuClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileLocalSmartMenuClientScript();
 
@@ -44,7 +44,7 @@ export async function getSmartMenuClientScript({ logBuffer, cache, debug = false
         }
     }
 
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,

@@ -14,10 +14,10 @@ type QRcodeMiddlewareOptions = {|
     logger? : LoggerType,
     cache? : CacheType,
     cdn? : boolean,
-    spbVersionManager: SDKVersionManager
+    buttonsVersionManager: SDKVersionManager
 |};
 
-export function getQRCodeMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), spbVersionManager } : QRcodeMiddlewareOptions = {}) : ExpressMiddleware {
+export function getQRCodeMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), buttonsVersionManager } : QRcodeMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
 
     return sdkMiddleware({ logger }, {
@@ -43,10 +43,10 @@ export function getQRCodeMiddleware({ logger = defaultLogger, cache, cdn = !isLo
                 }
             );
 
-            const clientScript = await getSmartQRCodeClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
-            const spbVersion = spbVersionManager.getLiveVersion()
+            const clientScript = await getSmartQRCodeClientScript({ debug, logBuffer, cache, useLocal, buttonsVersionManager });
+            const buttonsVersion = buttonsVersionManager.getLiveVersion()
 
-            logger.info(req, `qrcode_client_version_${ spbVersion }`);
+            logger.info(req, `qrcode_client_version_${ buttonsVersion }`);
             logger.info(req, `qrcode_params`, { params: JSON.stringify(params) });
 
             const pageHTML = `
@@ -58,7 +58,7 @@ export function getQRCodeMiddleware({ logger = defaultLogger, cache, cdn = !isLo
                     href="https://www.paypalobjects.com/paypal-ui/web/fonts-and-normalize/1-1-0/fonts-and-normalize.min.css"
                 />
             </head>
-            <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }">
+            <body data-nonce="${ cspNonce }" data-client-version="${ buttonsVersion }">
                 ${ meta.getSDKLoader({ nonce: cspNonce }) }
                 <script nonce="${ cspNonce }">${ clientScript }</script>
                 <script nonce="${ cspNonce }">

@@ -26,13 +26,13 @@ const logger = {
 };
 
 // $FlowFixMe testing impl
-const spbVersionManager: SDKVersionManager = {
+const buttonsVersionManager: SDKVersionManager = {
     getLiveVersion: () => '5.0.100',
     getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
 }
 
 test('should do a basic native popup render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, spbVersionManager });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -62,7 +62,7 @@ test('should do a basic native popup render and succeed', async () => {
 });
 
 test('should do a basic native popup render and fail with a non-paypal domain', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, spbVersionManager });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -92,7 +92,7 @@ test('should do a basic native popup render and fail with a non-paypal domain', 
 });
 
 test('should do a basic venmo popup render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, spbVersionManager });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -122,7 +122,7 @@ test('should do a basic venmo popup render and succeed', async () => {
 });
 
 test('should do a basic venmo popup render and fail with a non-paypal domain', async () => {
-    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, spbVersionManager });
+    const paypalNativePopupMiddleware = getNativePopupMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -152,7 +152,7 @@ test('should do a basic venmo popup render and fail with a non-paypal domain', a
 });
 
 test('should do a basic native fallback render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, spbVersionManager });
+    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.PAYPAL, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -182,7 +182,7 @@ test('should do a basic native fallback render and succeed', async () => {
 });
 
 test('should do a basic venmo fallback render and succeed', async () => {
-    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, spbVersionManager });
+    const paypalNativePopupMiddleware = getNativeFallbackMiddleware({ graphQL, cache, logger, tracking, fundingSource: FUNDING.VENMO, buttonsVersionManager });
 
     const req = mockReq({
         query: {

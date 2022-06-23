@@ -34,7 +34,7 @@ type ButtonMiddlewareOptions = {|
     getSDKLocationInformation : (req : ExpressRequest, env : string) => Promise<SDKLocationInformation>,
     getExperiments? : (req : ExpressRequest, params : GetExperimentsParams) => Promise<GetExperimentsType>,
     sdkVersionManager: SDKVersionManager,
-    spbVersionManager: SDKVersionManager
+    buttonsVersionManager: SDKVersionManager
 |};
 
 export function getButtonMiddleware({
@@ -51,7 +51,7 @@ export function getButtonMiddleware({
     getSDKLocationInformation,
     getExperiments = getDefaultExperiments,
     sdkVersionManager,
-    spbVersionManager,
+    buttonsVersionManager,
 } : ButtonMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
 
@@ -84,7 +84,7 @@ export function getButtonMiddleware({
 
             const facilitatorAccessTokenPromise = getAccessToken(req, clientID);
             const merchantIDPromise = facilitatorAccessTokenPromise.then(facilitatorAccessToken => resolveMerchantID(req, { merchantID: sdkMerchantID, getMerchantID, facilitatorAccessToken }));
-            const clientPromise = getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
+            const clientPromise = getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, buttonsVersionManager });
             const renderPromise = getPayPalSmartPaymentButtonsRenderScript({
                 sdkCDNRegistry: sdkLocationInformation?.sdkCDNRegistry,
                 cache,
@@ -93,7 +93,7 @@ export function getButtonMiddleware({
                 sdkVersionManager
             });
             const sdkVersion = sdkVersionManager.getLiveVersion();
-            const spbVersion = spbVersionManager.getLiveVersion()
+            const buttonsVersion = buttonsVersionManager.getLiveVersion()
 
             const fundingEligibilityPromise = resolveFundingEligibility(req, gqlBatch, {
                 logger, clientID, merchantID: sdkMerchantID, buttonSessionID, currency, intent, commit, vault,
@@ -151,7 +151,7 @@ export function getButtonMiddleware({
             };
 
             logger.info(req, `button_render_version_${ sdkVersion }`);
-            logger.info(req, `button_client_version_${ spbVersion }`);
+            logger.info(req, `button_client_version_${ buttonsVersion }`);
 
             const buttonProps = {
                 ...params,
@@ -212,7 +212,7 @@ export function getButtonMiddleware({
                       }
                     </script>
                 </head>
-                <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }" data-render-version="${ sdkVersion }" data-response-start-time="${ responseStartTime }">
+                <body data-nonce="${ cspNonce }" data-client-version="${ buttonsVersion }" data-render-version="${ sdkVersion }" data-response-start-time="${ responseStartTime }">
                     <style nonce="${ cspNonce }">${ buttonStyle }</style>
 
                     <div id="buttons-container" class="buttons-container" role="main" aria-label="PayPal">${ buttonHTML }</div>
@@ -229,7 +229,7 @@ export function getButtonMiddleware({
                     name:                  rootTransactionName,
                     client_id:             clientID,
                     sdk_version:           sdkVersion,
-                    smart_buttons_version: spbVersion
+                    smart_buttons_version: buttonsVersion
                 }
             });
             allowFrame(res);
@@ -240,7 +240,7 @@ export function getButtonMiddleware({
             logger.info(req, 'smart_buttons_script_render');
 
             const { debug } = getButtonParams(params, req, res);
-            const script = await getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
+            const script = await getSmartPaymentButtonsClientScript({ debug, logBuffer, cache, useLocal, buttonsVersionManager });
 
             return javascriptResponse(res, script);
         },

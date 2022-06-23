@@ -33,10 +33,10 @@ type GetSmartQRCodeClientScriptOptions = {|
     logBuffer : ?LoggerBufferType,
     cache : ?CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
-export async function getSmartQRCodeClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartQRCodeClientScriptOptions = {}) : Promise<string> {
+export async function getSmartQRCodeClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), buttonsVersionManager } : GetSmartQRCodeClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileLocalSmartQRCodeClientScript();
 
@@ -45,7 +45,7 @@ export async function getSmartQRCodeClientScript({ logBuffer, cache, debug = fal
         }
     }
 
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,

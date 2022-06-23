@@ -25,7 +25,7 @@ const logger = {
 };
 
 // $FlowFixMe testing impl
-const spbVersionManager: SDKVersionManager = {
+const buttonsVersionManager: SDKVersionManager = {
     getLiveVersion: () => '5.0.100',
     getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
 }
@@ -44,7 +44,7 @@ function isRenderCallCorrect ({ html } : {|html : string |}) : boolean {
 }
 
 test('should do a basic QRCode page render', async () => {
-    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, spbVersionManager });
+    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, buttonsVersionManager });
     const req = mockReq({
         query: {
             parentDomain: 'foo.paypal.com',
@@ -81,7 +81,7 @@ test('should do a basic QRCode page render', async () => {
 });
 
 test('should fail if qrPath query param not provided', async () => {
-    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, spbVersionManager });
+    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -115,7 +115,7 @@ test('should fail if qrPath query param not provided', async () => {
 });
 
 test('should fail with a non-paypal domain', async () => {
-    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, spbVersionManager });
+    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -145,7 +145,7 @@ test('should fail with a non-paypal domain', async () => {
 });
 
 test('should render & make correct init call when when "debug" param passed', async () => {
-    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, spbVersionManager });
+    const qrCodeMiddleware = getQRCodeMiddleware({ logger, cache, buttonsVersionManager });
 
     const req = mockReq({
         query: {

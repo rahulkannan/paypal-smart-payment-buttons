@@ -32,13 +32,13 @@ const logger = {
 
 
 // $FlowFixMe testing impl
-const spbVersionManager: SDKVersionManager = {
+const buttonsVersionManager: SDKVersionManager = {
     getLiveVersion: () => '5.0.100',
     getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
 }
 
 test('should do a basic card render and succeed', async () => {
-    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, spbVersionManager });
+    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, buttonsVersionManager });
 
     const req = mockReq({
         query: {
@@ -74,7 +74,7 @@ test('should do a basic card render and succeed', async () => {
 });
 
 test('should fail with a non-clientId', async () => {
-    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, spbVersionManager });
+    const cardMiddleware = getCardMiddleware({ logger, cache, getAccessToken, buttonsVersionManager });
 
     const req = mockReq({
         query: {

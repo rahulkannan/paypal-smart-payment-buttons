@@ -25,7 +25,7 @@ const logBuffer = {
 };
 
 // $FlowFixMe testing impl
-const spbVersionManager: SDKVersionManager = {
+const buttonsVersionManager: SDKVersionManager = {
     getLiveVersion: () => '5.0.100',
     getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
 }
@@ -49,7 +49,7 @@ test('getSmartQRCodeClientScript - base', async () => {
 test('getSmartQRCodeClientScript - debug', async () => {
     const debug = true;
 
-    const script = await getSmartQRCodeClientScript({ logBuffer, cache, debug, spbVersionManager });
+    const script = await getSmartQRCodeClientScript({ logBuffer, cache, debug, buttonsVersionManager });
 
     if (!script) {
         throw new Error(`Expected a script from compileLocalSmartQRCodeClientScript`);

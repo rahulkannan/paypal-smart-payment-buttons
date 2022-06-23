@@ -32,10 +32,10 @@ type GetSmartCardClientScriptOptions = {|
     logBuffer : ?LoggerBufferType,
     cache : ?CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
-export async function getSmartCardClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartCardClientScriptOptions = {}) : Promise<string> {
+export async function getSmartCardClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), buttonsVersionManager } : GetSmartCardClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileLocalSmartCardClientScript();
 
@@ -44,7 +44,7 @@ export async function getSmartCardClientScript({ logBuffer, cache, debug = false
         }
     }
 
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,

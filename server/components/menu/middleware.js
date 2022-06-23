@@ -12,10 +12,10 @@ type MenuMiddlewareOptions = {|
     logger? : LoggerType,
     cache? : CacheType,
     cdn? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
-export function getMenuMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), spbVersionManager } : MenuMiddlewareOptions = {}) : ExpressMiddleware {
+export function getMenuMiddleware({ logger = defaultLogger, cache, cdn = !isLocalOrTest(), buttonsVersionManager } : MenuMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
 
     return sdkMiddleware({ logger }, {
@@ -24,10 +24,10 @@ export function getMenuMiddleware({ logger = defaultLogger, cache, cdn = !isLoca
 
             const { clientID, cspNonce, debug } = getParams(params, req, res);
             
-            const clientScript = await getSmartMenuClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
-            const spbVersion = spbVersionManager.getLiveVersion()
+            const clientScript = await getSmartMenuClientScript({ debug, logBuffer, cache, useLocal, buttonsVersionManager });
+            const buttonsVersion = buttonsVersionManager.getLiveVersion()
 
-            logger.info(req, `menu_client_version_${ spbVersion }`);
+            logger.info(req, `menu_client_version_${ buttonsVersion }`);
             logger.info(req, `menu_params`, { params: JSON.stringify(params) });
 
             if (!clientID) {
@@ -37,7 +37,7 @@ export function getMenuMiddleware({ logger = defaultLogger, cache, cdn = !isLoca
             const pageHTML = `
                 <!DOCTYPE html>
                 <head></head>
-                <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }">
+                <body data-nonce="${ cspNonce }" data-client-version="${ buttonsVersion }">
                     ${ meta.getSDKLoader({ nonce: cspNonce }) }
                     <script nonce="${ cspNonce }">${ clientScript }</script>
                     <script nonce="${ cspNonce }">spb.setupMenu(${ safeJSON({ cspNonce }) })</script>

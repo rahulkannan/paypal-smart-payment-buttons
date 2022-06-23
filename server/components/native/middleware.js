@@ -18,7 +18,7 @@ type NativePopupMiddlewareOptions = {|
     tracking : (ExpressRequest) => void,
     fundingSource : $Values<typeof FUNDING>,
     cdn? : boolean,
-    spbVersionManager: SDKVersionManager
+    buttonsVersionManager: SDKVersionManager
 |};
 
 export function getNativePopupMiddleware({
@@ -27,7 +27,7 @@ export function getNativePopupMiddleware({
     cache,
     tracking,
     fundingSource,
-    spbVersionManager
+    buttonsVersionManager
 } : NativePopupMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
 
@@ -43,9 +43,9 @@ export function getNativePopupMiddleware({
             const { cspNonce, debug, parentDomain, env, sessionID, buttonSessionID,
                 sdkCorrelationID, clientID, locale, buyerCountry } = getNativePopupParams(params, req, res);
 
-            const { NativePopup } = (await getNativePopupRenderScript({ logBuffer, cache, debug, useLocal, spbVersionManager }));
-            const clientScript = await getNativePopupClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
-            const spbVersion = spbVersionManager.getLiveVersion()
+            const { NativePopup } = (await getNativePopupRenderScript({ logBuffer, cache, debug, useLocal, buttonsVersionManager }));
+            const clientScript = await getNativePopupClientScript({ debug, logBuffer, cache, useLocal, buttonsVersionManager });
+            const buttonsVersion = buttonsVersionManager.getLiveVersion()
 
             const setupParams : NativePopupOptions = {
                 parentDomain, env, sessionID, buttonSessionID, sdkCorrelationID,
@@ -59,7 +59,7 @@ export function getNativePopupMiddleware({
                     <link rel="manifest" href="/.well-known/manifest.webmanifest">
                     <title>Native Popup</title>
                 </head>
-                <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }">
+                <body data-nonce="${ cspNonce }" data-client-version="${ buttonsVersion }">
                     ${ NativePopup({ fundingSource, cspNonce }).render(html()) }
                     ${ meta.getSDKLoader({ nonce: cspNonce }) }
                     <script nonce="${ cspNonce }">${ clientScript }</script>
@@ -79,7 +79,7 @@ type NativeFallbackMiddlewareOptions = {|
     tracking : (ExpressRequest) => void,
     fundingSource : $Values<typeof FUNDING>,
     cdn? : boolean,
-    spbVersionManager: SDKVersionManager
+    buttonsVersionManager: SDKVersionManager
 |};
 
 export function getNativeFallbackMiddleware({
@@ -88,7 +88,7 @@ export function getNativeFallbackMiddleware({
     cache,
     tracking,
     fundingSource,
-    spbVersionManager
+    buttonsVersionManager
 } : NativeFallbackMiddlewareOptions = {}) : ExpressMiddleware {
     const useLocal = !cdn;
 
@@ -103,9 +103,9 @@ export function getNativeFallbackMiddleware({
 
             const { cspNonce, debug } = getNativeFallbackParams(params, req, res);
 
-            const { NativeFallback } = (await getNativeFallbackRenderScript({ logBuffer, cache, debug, useLocal, spbVersionManager }));
-            const clientScript = await getNativeFallbackClientScript({ debug, logBuffer, cache, useLocal, spbVersionManager });
-            const spbVersion = spbVersionManager.getLiveVersion()
+            const { NativeFallback } = (await getNativeFallbackRenderScript({ logBuffer, cache, debug, useLocal, buttonsVersionManager }));
+            const clientScript = await getNativeFallbackClientScript({ debug, logBuffer, cache, useLocal, buttonsVersionManager });
+            const buttonsVersion = buttonsVersionManager.getLiveVersion()
 
             const setupParams = {
 
@@ -117,7 +117,7 @@ export function getNativeFallbackMiddleware({
                     <meta name="viewport" content="width=device-width, initial-scale=1" />
                     <title>Native Fallback</title>
                 </head>
-                <body data-nonce="${ cspNonce }" data-client-version="${ spbVersion }">
+                <body data-nonce="${ cspNonce }" data-client-version="${ buttonsVersion }">
                     ${ NativeFallback({ fundingSource, cspNonce }).render(html()) }
                     ${ meta.getSDKLoader({ nonce: cspNonce }) }
                     <script nonce="${ cspNonce }">${ clientScript }</script>

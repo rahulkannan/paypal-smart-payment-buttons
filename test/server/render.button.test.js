@@ -48,7 +48,7 @@ const sdkVersionManager: SDKVersionManager = {
 }
 
 // $FlowFixMe testing impl
-const spbVersionManager: SDKVersionManager = {
+const buttonsVersionManager: SDKVersionManager = {
     getLiveVersion: () => '5.0.100',
     getOrInstallSDK: async (...args) => await getVersionFromNodeModules(args),
 }
@@ -56,7 +56,7 @@ const spbVersionManager: SDKVersionManager = {
 test('should do a basic button render and succeed', async () => {
     const buttonMiddleware = getButtonMiddleware({ 
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -138,7 +138,7 @@ test('should do a basic button render and succeed when graphql fundingEligibilit
 
     const errButtonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -185,7 +185,7 @@ test('should do a basic button render and succeed when graphql fundingEligibilit
 test('should give a 400 error with no clientID passed', async () => {
     const buttonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -213,7 +213,7 @@ test('should give a 400 error with no clientID passed', async () => {
 test('should give a 400 error when an error occur while rendering button', async () => {
     const buttonMiddleware = getButtonMiddleware({ 
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -247,7 +247,7 @@ test('should give a 400 error when an error occur while rendering button', async
 test('should render empty personalization when API errors', async () => {
     const buttonMiddleware = getButtonMiddleware({ 
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -281,7 +281,7 @@ test('should render empty personalization when API errors', async () => {
 test('should render empty personalization when config is disabled', async () => {
     const buttonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -314,7 +314,7 @@ test('should render empty personalization when config is disabled', async () => 
 test('should render filled out tagline when config is enabled', async () => {
     const buttonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -347,7 +347,7 @@ test('should render filled out tagline when config is enabled', async () => {
 test('should do a basic button render with post and succeed', async () => {
     const buttonMiddleware = getButtonMiddleware({ 
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL,
         getAccessToken,
         getMerchantID,
@@ -405,7 +405,7 @@ test('should do a basic button render with post and succeed', async () => {
 test('should find the req.model.rootTxn object in the req', async () => {
     const buttonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL, getAccessToken, getMerchantID,
         content: mockContent, cache, logger, tracking,
         getPersonalizationEnabled,
@@ -434,7 +434,7 @@ test('should find the req.model.rootTxn object in the req', async () => {
 test('should find the rootTxn name in the req model when is wallet', async () => {
     const buttonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL, getAccessToken, getMerchantID,
         content: mockContent, cache, logger, tracking,
         getPersonalizationEnabled,
@@ -461,7 +461,7 @@ test('should find the rootTxn name in the req model when is wallet', async () =>
 test('should find the req.model.rootTxn.name in the req model when is vault', async () => {
     const buttonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         graphQL, getAccessToken, getMerchantID,
         content: mockContent, cache, logger, tracking,
         getPersonalizationEnabled,
@@ -493,7 +493,7 @@ test('should return an HTML page with the error', async () => {
     });
     const buttonMiddleware = getButtonMiddleware({
         sdkVersionManager,
-        spbVersionManager,
+        buttonsVersionManager,
         content: mockContent, tracking: mockTracking,
         cache, logger, graphQL, getAccessToken, getMerchantID,
         getPersonalizationEnabled,

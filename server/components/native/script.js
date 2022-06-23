@@ -35,10 +35,10 @@ type GetNativePopupClientScriptOptions = {|
     logBuffer : ?LoggerBufferType,
     cache : ?CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
-export async function getNativePopupClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativePopupClientScriptOptions = {}) : Promise<string> {
+export async function getNativePopupClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), buttonsVersionManager } : GetNativePopupClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileNativePopupClientScript();
         if (script) {
@@ -46,7 +46,7 @@ export async function getNativePopupClientScript({ logBuffer, cache, debug = fal
         }
     }
 
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,
@@ -70,7 +70,7 @@ type GetNativePopupRenderScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
 async function getLocalNativePopupRenderScript() : Promise<?NativePopupRenderScript> {
@@ -91,7 +91,7 @@ async function getLocalNativePopupRenderScript() : Promise<?NativePopupRenderScr
     }
 }
 
-export async function getNativePopupRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), spbVersionManager } : GetNativePopupRenderScriptOptions = {}) : Promise<NativePopupRenderScript> {
+export async function getNativePopupRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), buttonsVersionManager } : GetNativePopupRenderScriptOptions = {}) : Promise<NativePopupRenderScript> {
     if (useLocal) {
         const script = await getLocalNativePopupRenderScript();
         if (script) {
@@ -99,7 +99,7 @@ export async function getNativePopupRenderScript({ logBuffer, cache, debug, useL
         }
     }
 
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,
@@ -134,10 +134,10 @@ type GetNativeFallbackClientScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
-export async function getNativeFallbackClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetNativeFallbackClientScriptOptions = {}) : Promise<string> {
+export async function getNativeFallbackClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), buttonsVersionManager } : GetNativeFallbackClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileNativeFallbackClientScript();
         if (script) {
@@ -145,7 +145,7 @@ export async function getNativeFallbackClientScript({ logBuffer, cache, debug = 
         }
     }
 
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,
@@ -169,7 +169,7 @@ type GetNativeFallbackRenderScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
 async function getLocalNativeFallbackRenderScript() : Promise<?NativeFallbackRenderScript> {
@@ -190,7 +190,7 @@ async function getLocalNativeFallbackRenderScript() : Promise<?NativeFallbackRen
     }
 }
 
-export async function getNativeFallbackRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), spbVersionManager } : GetNativeFallbackRenderScriptOptions = {}) : Promise<NativeFallbackRenderScript> {
+export async function getNativeFallbackRenderScript({ logBuffer, cache, debug, useLocal = isLocalOrTest(), buttonsVersionManager } : GetNativeFallbackRenderScriptOptions = {}) : Promise<NativeFallbackRenderScript> {
     if (useLocal) {
         const script = await getLocalNativeFallbackRenderScript();
         if (script) {
@@ -198,7 +198,7 @@ export async function getNativeFallbackRenderScript({ logBuffer, cache, debug, u
         }
     }
 
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,

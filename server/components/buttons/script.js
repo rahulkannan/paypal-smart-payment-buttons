@@ -94,10 +94,10 @@ type GetSmartPaymentButtonsClientScriptOptions = {|
     logBuffer : LoggerBufferType,
     cache : CacheType,
     useLocal? : boolean,
-    spbVersionManager : SDKVersionManager
+    buttonsVersionManager : SDKVersionManager
 |};
 
-export async function getSmartPaymentButtonsClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), spbVersionManager } : GetSmartPaymentButtonsClientScriptOptions = {}) : Promise<string> {
+export async function getSmartPaymentButtonsClientScript({ logBuffer, cache, debug = false, useLocal = isLocalOrTest(), buttonsVersionManager } : GetSmartPaymentButtonsClientScriptOptions = {}) : Promise<string> {
     if (useLocal) {
         const script = await compileLocalSmartButtonsClientScript();
         if (script) {
@@ -105,7 +105,7 @@ export async function getSmartPaymentButtonsClientScript({ logBuffer, cache, deb
         }
     }
     
-    const moduleDetails = await spbVersionManager.getOrInstallSDK({
+    const moduleDetails = await buttonsVersionManager.getOrInstallSDK({
         flat:         true,
         dependencies: false,
         logger:       logBuffer,

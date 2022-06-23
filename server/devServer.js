@@ -277,14 +277,14 @@ const buttonMiddleware = getButtonMiddleware({
     // $FlowFixMe we don't use this locally
     sdkVersionManager: {},
     // $FlowFixMe we don't use this locally
-    spbVersionManager: {},
+    buttonsVersionManager: {},
 });
 
 const menuMiddleware = getMenuMiddleware({
     cache,
     logger,
     // $FlowFixMe we don't use this locally
-    spbVersionManager: {},
+    buttonsVersionManager: {},
 });
 
 const nativePopupMiddleware = getNativePopupMiddleware({
@@ -294,7 +294,7 @@ const nativePopupMiddleware = getNativePopupMiddleware({
     tracking,
     fundingSource: FUNDING.PAYPAL,
     // $FlowFixMe we don't use this locally
-    spbVersionManager: {},
+    buttonsVersionManager: {},
 });
 
 const nativeFallbackMiddleware = getNativeFallbackMiddleware({
@@ -304,14 +304,14 @@ const nativeFallbackMiddleware = getNativeFallbackMiddleware({
     tracking,
     fundingSource: FUNDING.PAYPAL,
     // $FlowFixMe we don't use this locally
-    spbVersionManager: {},
+    buttonsVersionManager: {},
 });
 
 const qrCodeMiddleware = getQRCodeMiddleware({
     cache,
     logger,
     // $FlowFixMe we don't use this locally
-    spbVersionManager: {},
+    buttonsVersionManager: {},
 });
 
 const venmoPopupMiddleware = getNativePopupMiddleware({
@@ -321,7 +321,7 @@ const venmoPopupMiddleware = getNativePopupMiddleware({
     tracking,
     fundingSource: FUNDING.VENMO,
     // $FlowFixMe we don't use this locally
-    spbVersionManager: {},
+    buttonsVersionManager: {},
 });
 
 const venmoFallbackMiddleware = getNativeFallbackMiddleware({
@@ -331,7 +331,7 @@ const venmoFallbackMiddleware = getNativeFallbackMiddleware({
     tracking,
     fundingSource: FUNDING.VENMO,
     // $FlowFixMe we don't use this locally
-    spbVersionManager: {},
+    buttonsVersionManager: {},
 });
 
 const buttonsScriptMiddleware = webpackDevMiddleware(webpack(WEBPACK_CONFIG_BUTTONS_LOCAL_DEBUG), { serverSideRender: true });
