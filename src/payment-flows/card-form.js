@@ -19,7 +19,7 @@ function setupCardForm() {
 let cardFormOpen = false;
 
 function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolean {
-    const { vault, onShippingChange, onShippingAddressChange, onShippingOptionsChange, experience } = props;
+    const { vault, onShippingChange, experience } = props;
     const { eligibility } = serviceData;
 
     if (experience === EXPERIENCE.INLINE && !isCrossSiteTrackingEnabled('enforce_policy')) {
@@ -32,7 +32,7 @@ function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolea
                 [FPTI_KEY.EXPERIMENT_NAME]: 'inlinexo',
                 [FPTI_KEY.TREATMENT_NAME]:  treatment
             }).flush();
-            
+
         return inlinexoExperiment.isEnabled() ? false : true;
     }
 
@@ -40,7 +40,7 @@ function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolea
         return false;
     }
 
-    if (onShippingChange || onShippingAddressChange || onShippingOptionsChange) {
+    if (onShippingChange) {
         return false;
     }
 
