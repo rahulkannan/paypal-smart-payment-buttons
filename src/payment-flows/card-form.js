@@ -32,7 +32,8 @@ function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolea
                 [FPTI_KEY.EXPERIMENT_NAME]: 'inlinexo',
                 [FPTI_KEY.TREATMENT_NAME]:  treatment
             }).flush();
-        return false;
+            
+        return inlinexoExperiment.isEnabled() ? false : true;
     }
 
     if (vault) {
