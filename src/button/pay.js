@@ -1,6 +1,6 @@
 /* @flow */
 
-import { noop, stringifyError } from '@krakenjs/belter/src';
+import { noop, stringifyError, isCrossSiteTrackingEnabled } from '@krakenjs/belter/src';
 import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FPTI_KEY } from '@paypal/sdk-constants/src';
@@ -109,7 +109,13 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 [FPTI_KEY.IS_VAULT]:          instrumentType ? '1' : '0',
                 [FPTI_CUSTOM_KEY.INFO_MSG]:   enableNativeCheckout ? 'tester' : '',
                 [FPTI_CUSTOM_KEY.EXPERIENCE]: experience === EXPERIENCE.INLINE ? 'inline' : ''
-            }).flush();
+            });
+
+            getLogger()
+                .info(`cross_site_tracking_enabled_${ String(isCrossSiteTrackingEnabled('enforce_policy')) }`)
+                .track({
+                    [FPTI_KEY.TRANSITION]: `cross_site_tracking_enabled_${ String(isCrossSiteTrackingEnabled('enforce_policy')) }`
+                }).flush();
 
         const loggingPromise =  ZalgoPromise.try(() => {
             return window.xprops.sessionState.get(`__confirm_${ fundingSource }_payload__`).then(confirmPayload => {

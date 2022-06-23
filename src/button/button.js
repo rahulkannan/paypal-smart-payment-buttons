@@ -1,13 +1,13 @@
 /* @flow */
 
-import { onClick as onElementClick, querySelectorAll, noop, stringifyErrorMessage, stringifyError, preventClickFocus, isCrossSiteTrackingEnabled } from '@krakenjs/belter/src';
+import { onClick as onElementClick, querySelectorAll, noop, stringifyErrorMessage, stringifyError, preventClickFocus } from '@krakenjs/belter/src';
 import { COUNTRY, FPTI_KEY, type FundingEligibilityType } from '@paypal/sdk-constants/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { ContentType, Wallet, PersonalizationType } from '../types';
 import { getLogger, getSmartFieldsByFundingSource } from '../lib';
 import { type FirebaseConfig } from '../api';
-import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_CONTEXT_TYPE, AMPLITUDE_KEY } from '../constants';
+import { DATA_ATTRIBUTES, BUYER_INTENT } from '../constants';
 import { type Payment } from '../payment-flows';
 
 import { getButtonProps, getConfig, getComponents, getServiceData, type ButtonProps } from './props';
@@ -81,16 +81,6 @@ export function setupButton(opts : ButtonOpts) : ZalgoPromise<void> {
     const { initPromise, isEnabled } = onInit({ correlationID: buttonCorrelationID });
 
     let paymentProcessing = false;
-    
-    getLogger()
-        .info(`cross_site_tracking_enabled_${ String(isCrossSiteTrackingEnabled('enforce_policy')) }`)
-        .track({
-            [FPTI_KEY.TRANSITION]: `cross_site_tracking_enabled_${ String(isCrossSiteTrackingEnabled('enforce_policy')) }`,
-            [FPTI_KEY.CONTEXT_TYPE]:       FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID,
-            [FPTI_KEY.CONTEXT_ID]:         buttonSessionID,
-            [FPTI_KEY.BUTTON_SESSION_UID]: buttonSessionID,
-            [AMPLITUDE_KEY.USER_ID]:       buttonSessionID,
-        }).flush();
 
     function initiatePayment({ payment, props: paymentProps } : {| props : ButtonProps, payment : Payment |}) : ZalgoPromise<void> {
         return ZalgoPromise.try(() => {
