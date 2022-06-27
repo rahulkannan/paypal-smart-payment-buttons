@@ -407,6 +407,5 @@ export const checkout : PaymentFlow = {
     isEligible:             isCheckoutEligible,
     isPaymentEligible:      isCheckoutPaymentEligible,
     init:                   initCheckout,
-    inline,
     updateFlowClientConfig: updateCheckoutClientConfig
 };
