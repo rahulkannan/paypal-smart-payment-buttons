@@ -110,130 +110,6 @@ describe('Inline XO cases', () => {
         });
     });
 
-    it('should call onComplete if experience is inline and capture if intent is authorize', async () => {
-        return await wrapPromise(async ({ expect, avoid }) => {
-
-            const orderID = generateOrderID();
-            const facilitatorAccessToken = uniqueID();
-
-            window.xprops.experience = 'inline';
-            window.xprops.intent = 'authorize';
-
-            const getOrderDetailsMock = getGraphQLApiMock({
-                extraHandler: expect('orderDetailsCall', ({ data }) => {
-
-                    if (data.query.includes('query GetCheckoutDetails')) {
-                        return {
-                            data: {
-                                checkoutSession: {
-                                    cart: {
-                                        intent:  'authorize',
-                                        amounts: {
-                                            total: {
-                                                currencyCode: 'USD'
-                                            }
-                                        }
-                                    },
-                                    payees: [
-                                        {
-                                            merchantId: 'XYZ12345',
-                                            email:       {
-                                                stringValue: 'xyz-us-b1@paypal.com'
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        };
-                    }
-                })
-            }).expectCalls();
-
-            window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
-                return ZalgoPromise.try(() => {
-                    return orderID;
-                });
-            }));
-
-            window.xprops.onCancel = avoid('onCancel');
-            window.xprops.onApprove = avoid('onApprove');
-            window.xprops.onError = avoid('onError');
-
-            window.xprops.onComplete = expect('onComplete', async (data, actions) => {
-                if (data.orderID !== orderID) {
-                    throw new Error(`Expected orderID to be ${ orderID }, got ${ data.orderID }`);
-                }
-
-                if (!actions.redirect) {
-                    throw new Error(`Expected actions.redirect() to be available.`);
-                }
-
-                const captureOrderMock = getRestfulCaptureOrderApiMock({
-                    handler: expect('captureAuthorization', ({ headers }) => {
-                        if (headers.authorization !== `Bearer ${ facilitatorAccessToken }`) {
-                            throw new Error(`Expected call to come with correct facilitator access token`);
-                        }
-
-                        return {
-                            id: orderID
-                        };
-                    })
-                });
-                captureOrderMock.expectCalls();
-                if (data.intent === 'authorize') {
-                    await actions.capture();
-                }
-                captureOrderMock.done();
-            });
-
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {
-
-                mockFunction(props, 'onComplete', expect('onComplete', ({ original: onCompleteOriginal, args: [ data, actions ] }) => {
-                    return onCompleteOriginal({ ...data }, actions);
-                }));
-
-                const checkoutInstance = CheckoutOriginal(props);
-
-                mockFunction(checkoutInstance, 'renderTo', expect('renderTo', async ({ original: renderToOriginal, args }) => {
-                    const [ win, element, context ] = args;
-
-                    if (!win) {
-                        throw new Error(`Expected window to be passed to renderTo`);
-                    }
-
-                    if (!element || typeof element !== 'string') {
-                        throw new Error(`Expected string element to be passed to renderTo`);
-                    }
-
-                    if (context !== 'iframe') {
-                        throw new Error(`Expected context to be iframe, got ${ context }`);
-                    }
-
-                    return props.createOrder().then(id => {
-                        if (id !== orderID) {
-                            throw new Error(`Expected orderID to be ${ orderID }, got ${ id }`);
-                        }
-
-                        return renderToOriginal(...args);
-                    });
-                }));
-
-                return checkoutInstance;
-            }));
-
-            createButtonHTML({ fundingEligibility });
-            await mockSetupButton({
-                experience: 'inline',
-                merchantID: [ 'XYZ12345' ],
-                fundingEligibility,
-                facilitatorAccessToken
-            });
-            await clickButton(FUNDING.CARD);
-
-            getOrderDetailsMock.done();
-        });
-    });
-
     it('should call onComplete if experience is inline and get order when captured', async () => {
         return await wrapPromise(async ({ expect, avoid }) => {
 
@@ -273,7 +149,7 @@ describe('Inline XO cases', () => {
                     })
                 });
                 getOrderMock.expectCalls();
-                await actions.get();
+                await actions.order.get();
                 getOrderMock.done();
             });
 
