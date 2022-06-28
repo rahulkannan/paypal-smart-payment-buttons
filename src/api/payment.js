@@ -1,9 +1,9 @@
 /* @flow */
 
 import type { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { FPTI_KEY } from '@paypal/sdk-constants/src';
+import { CURRENCY, FPTI_KEY } from '@paypal/sdk-constants/src';
 
-import { PAYMENTS_API_URL } from '../config';
+import { PAYMENTS_API_URL, PAYMENTS_CAPTURE_URL } from '../config';
 import { getLogger } from '../lib';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, HEADERS } from '../constants';
 import type { ApplePayPayment } from '../payment-flows/types';
@@ -125,6 +125,57 @@ export function patchPayment(paymentID : string, data : PatchData, { facilitator
         headers:     {
             [HEADERS.PARTNER_ATTRIBUTION_ID]: partnerAttributionID || ''
         }
+    });
+}
+
+export type AuthorizationCaptureData = {|
+    amount: {|
+        currency_code : $Values<typeof CURRENCY>,
+        value : string
+    |},
+    final_capture : boolean,
+    invoice_id : string,
+    note_to_payer? : string,
+    soft_descriptor? : string
+|};
+
+export type AuthorizationCaptureResponse = {|
+    id : string,
+    status : string
+|};
+
+export function captureAuthorization(id : ?string, data : AuthorizationCaptureData, { facilitatorAccessToken, partnerAttributionID } : PaymentAPIOptions) : ZalgoPromise<AuthorizationCaptureResponse> {
+    getLogger().info(`rest_api_capture_authorization`);
+
+    if (!id) {
+        throw new Error(`Must provide authorization id to capture.`);
+    }
+
+    return callRestAPI({
+        accessToken: facilitatorAccessToken,
+        method:      'post',
+        eventName:   'v2_payments_authorizations_capture',
+        url:         `${ PAYMENTS_CAPTURE_URL }/${ id }/capture`,
+        data,
+        headers:     {
+            [HEADERS.PARTNER_ATTRIBUTION_ID]: partnerAttributionID || ''
+        }
+    }).then(body => {
+
+        const captureID = body && body.id;
+
+        if (!captureID) {
+            throw new Error(`Payment Api response error:\n\n${ JSON.stringify(body, null, 4) }`);
+        }
+
+        getLogger().track({
+            [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.CAPTURE_AUTHORIZATION,
+            [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.PAYMENT_ID,
+            [FPTI_KEY.TOKEN]:        captureID,
+            [FPTI_KEY.CONTEXT_ID]:   captureID
+        });
+
+        return body;
     });
 }
 

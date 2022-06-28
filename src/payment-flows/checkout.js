@@ -240,13 +240,13 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .catch(noop);
             },
 
-            onComplete: () => {
+            onComplete: ({ authorizationID }) => {
                 getLogger().info(`spb_oncomplete_access_token_${ buyerAccessToken ? 'present' : 'not_present' }`).flush();
 
                 setBuyerAccessToken(buyerAccessToken);
 
                 // eslint-disable-next-line no-use-before-define
-                return onComplete({ buyerAccessToken }, { restart })
+                return onComplete({ buyerAccessToken, authorizationID }, { restart })
                     // eslint-disable-next-line no-use-before-define
                     .finally(() => close().then(noop))
                     .catch(noop);
