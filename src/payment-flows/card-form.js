@@ -3,7 +3,7 @@
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FUNDING, CARD, FPTI_KEY } from '@paypal/sdk-constants/src';
 import { createExperiment } from '@paypal/sdk-client/src';
-import { memoize, querySelectorAll, debounce, noop, isCrossSiteTrackingEnabled } from '@krakenjs/belter/src';
+import { memoize, querySelectorAll, debounce, noop } from '@krakenjs/belter/src';
 import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 
 import { DATA_ATTRIBUTES } from '../constants';
@@ -23,7 +23,7 @@ function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolea
     const { vault, onShippingChange, experience } = props;
     const { eligibility } = serviceData;
 
-    if (experience === EXPERIENCE.INLINE && !isCrossSiteTrackingEnabled('enforce_policy')) {
+    if (experience === EXPERIENCE.INLINE) {
         const inlinexoExperiment = createExperiment('inlinexo', 50, getLogger());
         const treatment = inlinexoExperiment.getTreatment();
 
