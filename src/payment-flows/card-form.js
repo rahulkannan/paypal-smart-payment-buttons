@@ -17,7 +17,6 @@ function setupCardForm() {
 }
 
 let cardFormOpen = false;
-let inlineExperimentLogged = false;
 
 function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolean {
     const { vault, onShippingChange, experience } = props;
@@ -27,18 +26,14 @@ function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolea
         const inlinexoExperiment = createExperiment('inlinexo', 50, getLogger());
         const treatment = inlinexoExperiment.getTreatment();
 
-        if (!inlineExperimentLogged) {
-            inlineExperimentLogged = true;
-            
-            getLogger()
-                .info(treatment)
-                .track({
-                    [FPTI_KEY.EXPERIMENT_NAME]: 'inlinexo',
-                    [FPTI_KEY.TREATMENT_NAME]:  treatment,
-                    [FPTI_KEY.TRANSITION]:      'process_pxp_check',
-                    [FPTI_KEY.STATE]:           'pxp_check'
-                }).flush();
-        }
+        getLogger()
+            .info(treatment)
+            .track({
+                [FPTI_KEY.EXPERIMENT_NAME]: 'inlinexo',
+                [FPTI_KEY.TREATMENT_NAME]:  treatment,
+                [FPTI_KEY.TRANSITION]:      'process_pxp_check',
+                [FPTI_KEY.STATE]:           'pxp_check'
+            }).flush();
 
         return inlinexoExperiment.isEnabled() ? false : true;
     }
