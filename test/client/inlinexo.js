@@ -12,9 +12,7 @@ import {
     createButtonHTML,
     mockFunction,
     clickButton,
-    getRestfulCaptureOrderApiMock,
-    getRestfulGetOrderApiMock,
-    getGraphQLApiMock
+    getRestfulGetOrderApiMock
 } from './mocks';
 
 describe('Inline XO cases', () => {
