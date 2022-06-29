@@ -16,7 +16,6 @@ import {
 } from './mocks';
 
 describe('Inline XO cases', () => {
-    
     const fundingEligibility = {
         [ FUNDING.PAYPAL ]: {
             eligible: true
@@ -36,10 +35,6 @@ describe('Inline XO cases', () => {
             }
         }
     };
-
-    afterEach(() => {
-        window.xprops.intent = 'capture';
-    });
 
     it('should call onComplete if experience is inline', async () => {
         return await wrapPromise(async ({ expect, avoid }) => {
@@ -67,6 +62,7 @@ describe('Inline XO cases', () => {
                     throw new Error(`Expected actions.redirect() to be available.`);
                 }
             }));
+
 
             mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {
                 mockFunction(props, 'onComplete', expect('onComplete', ({ original: onCompleteOriginal, args: [ data, actions ] }) => {
